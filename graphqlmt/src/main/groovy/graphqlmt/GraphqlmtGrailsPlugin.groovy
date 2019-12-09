@@ -6,6 +6,7 @@ import graphql.GraphQL
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import graphql.schema.idl.SchemaGenerator;
 
 
 class GraphqlmtGrailsPlugin extends Plugin {
@@ -59,8 +60,11 @@ Brief summary/description of the plugin.
             // graphQLSchema(graphQLSchemaGenerator: "generate")
             typeRegistry(TypeDefinitionRegistry)
 
-            graphQLSchemaGenerator(GraphqlSchemaGenerator) {
+            schemaGenerator(SchemaGenerator)
+
+            graphQLSchemaFactory(GraphqlSchemaFactory) {
               typeRegistry = ref('typeRegistry')
+              schemaGenerator = ref('schemaGenerator')
             }
 
             graphQLSchema(graphQLSchemaFactory: "generate")
