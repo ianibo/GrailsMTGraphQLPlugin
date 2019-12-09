@@ -1,0 +1,2 @@
+include 'grails4-schema-per-tenant-test'
+include 'graphqlmt'
