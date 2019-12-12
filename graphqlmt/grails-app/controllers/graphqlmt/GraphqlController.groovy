@@ -10,6 +10,7 @@ import groovy.transform.CompileStatic
 import org.springframework.context.MessageSource
 import graphql.GraphQL
 import groovy.transform.CompileStatic
+import grails.converters.JSON
 
 class GraphqlController {
 
@@ -18,7 +19,6 @@ class GraphqlController {
 
   // https://github.com/grails/gorm-graphql/blob/master/plugin/grails-app/controllers/org/grails/gorm/graphql/plugin/GraphqlController.groovy
   def index() {
-
     log.debug("GraphqlController::index(${params})");
     String query = null;
     String operationName = null;
@@ -34,6 +34,7 @@ class GraphqlController {
       
     }
 
+    log.debug("Process query: ${query}");
     Map<String, Object> result = new LinkedHashMap<>()
 
     ExecutionResult executionResult = graphQL.execute(ExecutionInput.newExecutionInput()
@@ -50,5 +51,11 @@ class GraphqlController {
     result.put('data', executionResult.data)
 
     respond result
+  }
+
+  def test() {
+    log.debug("test");
+    def result = [ status: 'OK' ];
+    render result as JSON;
   }
 }
