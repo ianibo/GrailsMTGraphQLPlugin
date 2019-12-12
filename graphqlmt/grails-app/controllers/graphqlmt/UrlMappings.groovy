@@ -3,6 +3,6 @@ package graphqlmt
 class UrlMappings {
 
     static mappings = {
-        "/graphql"(controller: 'graphql', action:'index')
+        "/graphql"(controller: 'graphql')
     }
 }

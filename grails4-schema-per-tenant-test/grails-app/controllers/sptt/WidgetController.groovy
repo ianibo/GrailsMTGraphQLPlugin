@@ -20,4 +20,10 @@ class WidgetController {
 
     render result as JSON
   }
+
+  def test() {
+    log.debug("test");
+    def result = [ result: 'hello' ]
+    render result as JSON
+  }
 }

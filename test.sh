@@ -20,6 +20,7 @@ curl -X "POST" "http://localhost:8080/graphql" \
 
 curl -X "POST" "http://localhost:8080/graphql" \
      -H "Accept: application/graphql" \
+     --header "X-TENANT: test" \
      -H "Content-Type: application/json" -d '{
   "query": "query { __schema { types { name } } }",
   "variables":{
