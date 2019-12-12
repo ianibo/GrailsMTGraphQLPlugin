@@ -26,9 +26,23 @@ class GraphqlController {
     Map<String,Object> variables = [:]
 
     if (request.contentLength != 0 && request.method != 'GET' ) {
-      String encoding = request.characterEncoding ?: 'UTF-8'
-      InputStream is = request.getInputStream();
-      query = IOUtils.toString(is, encoding)
+      switch ( request.format ) {
+        case 'application/graphql':
+          String encoding = request.characterEncoding ?: 'UTF-8'
+          InputStream is = request.getInputStream();
+          query = IOUtils.toString(is, encoding)
+          log.debug("Handle graraphql ${query}");
+          break;
+        case 'json':
+          log.debug("Handle graphql in json ${request.JSON}");
+          query = request.JSON.query;
+          variables = (request.JSON.variables instanceof Map) ? (Map)request.JSON.variables : Collections.emptyMap()
+          operationName = request.JSON.operationName
+          break;
+        default:
+          log.warn("Unhandled mime type ${request.format}");
+          break;
+      }
     } else {
       // graphQLRequest = GraphQLRequestUtils.graphQLRequestWithParams(params)
       
@@ -53,9 +67,4 @@ class GraphqlController {
     respond result
   }
 
-  def test() {
-    log.debug("test");
-    def result = [ status: 'OK' ];
-    render result as JSON;
-  }
 }
