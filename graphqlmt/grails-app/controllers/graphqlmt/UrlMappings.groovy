@@ -1,6 +1,8 @@
+package graphqlmt
+
 class UrlMappings {
 
     static mappings = {
-        "/graphql/$action?"(controller: 'graphql')
+        "/graphql"(controller: 'graphql', action:'index')
     }
 }

@@ -53,6 +53,9 @@ grails:
                         - WebKit
                         - Presto
                         - Trident
+        use:
+            accept:
+                header: true
         types:
             all: '*/*'
             atom: application/atom+xml
