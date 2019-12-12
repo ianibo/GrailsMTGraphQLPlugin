@@ -35,6 +35,7 @@ class GraphqlSchemaFactory implements GrailsApplicationAware {
     GraphQLObjectType.Builder mutationType = newObject().name('Mutation')
 
 
+    // see https://github.com/grails/gorm-graphql/blob/aabd1ca5bf904a9d6298fe63b6dbf427fbaab506/core/src/main/groovy/org/grails/gorm/graphql/Schema.groovy
     (grailsApplication.getArtefacts("Domain")).each {GrailsClass dc ->
       log.debug("registerDomainClass(${dc}) - ${dc.getName()}");
       // grailsApplication.mainContext.graphQLService.registerDomainClass(gc);
