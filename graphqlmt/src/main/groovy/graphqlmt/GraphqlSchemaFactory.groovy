@@ -10,6 +10,7 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import graphql.schema.StaticDataFetcher;
 
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLFieldDefinition
@@ -30,6 +31,7 @@ class GraphqlSchemaFactory implements GrailsApplicationAware {
   SchemaGenerator schemaGenerator
   GrailsApplication grailsApplication
 
+  Map typedefs = [:]
   
 
   GraphQLSchema generate() {
@@ -56,14 +58,18 @@ class GraphqlSchemaFactory implements GrailsApplicationAware {
       //                           .dataFetcher(new InterceptingDataFetcher(entity, serviceManager, queryInterceptorInvoker, GET, getFetcher))
 
       // Lets get the type definition for the given entity
-      ObjectTypeDefinition objectType = getTypeDefinition(dc);
+      registerTypeDefinition(dc);
 
-      GraphQLFieldDefinition.Builder b = new GraphQLFieldDefinition.Builder()
-      b.name('wibblexyz')
-      b.type(GraphQLTypeReference.typeRef(dc.getName()))
+      // b.type(GraphQLTypeReference.typeRef(dc.getName()))
       // We need to add a field to the query object for each domain class we wish to expose - given the Widget domain we may want to expose query { widget 
-      queryType.field(b.build());
+      // https://github.com/graphql-java/graphql-java/issues/1301
+      queryType.field(newFieldDefinition()
+                         .name("hello")
+                         .type(graphql.Scalars.GraphQLString)
+                         .dataFetcher(new StaticDataFetcher("world!")));
     }
+
+    log.debug("Completed read of all domain classes - build schema");
 
 
     // https://github.com/graphql-java/graphql-java/blob/master/src/main/java/graphql/schema/idl/RuntimeWiring.java
@@ -79,30 +85,31 @@ class GraphqlSchemaFactory implements GrailsApplicationAware {
   }
 
   // see  https://github.com/graphql-java/graphql-java/blob/master/src/main/java/graphql/schema/idl/RuntimeWiring.java
-  private ObjectTypeDefinition getTypeDefinition(GrailsClass gc) {
+  private GraphQLObjectType registerTypeDefinition(GrailsClass gc) {
 
-    ObjectTypeDefinition result = null;
     String typename = gc.getName()
+    GraphQLObjectType result = typedefs.get(typename);
 
     // Return the type if we already know about it otherwise register it
-    java.util.Optional o = typeRegistry.getType(typename)
-    if ( o.isPresent() ) {
-      result = o.get();
-    }
-    else {
-      // result = newObject()
-      //           .name(typename)
-      //           .field(newFieldDefinition()
-      //                   .name("id")
-      //                   .type(graphql.Scalars.GraphQLString)
-      //           )
-      //           .build().getDefinition();
-      // https://javadoc.io/static/com.graphql-java/graphql-java/2019-10-21T00-35-45-a74776c/index.html?graphql/language/FieldDefinition.html
-      ObjectTypeDefinition.Builder b = new ObjectTypeDefinition.Builder()
-      result = b.name(typename)
-                // .fieldDefinition( new FieldDefinition.Builder().name('id').type(graphql.Scalars.GraphQLString).build() )
-                .build();
-      typeRegistry.add(result);
+    if ( result == null ) {
+      result = newObject()
+                 .name(typename)
+                 .field(newFieldDefinition()
+                         .name("id")
+                         .type(graphql.Scalars.GraphQLString)
+                 )
+                 .build()
+      typedefs[typename] = result;
+
+      def type_definition = result.getDefinition();
+      log.debug("Register type for ${typename} - instanceof ${type_definition?.class?.name}");
+
+      if ( type_definition != null ) {
+        typeRegistry.add(type_definition);
+      }
+      else {
+        log.error("Type null... Should not happen. Type was ${result?.class?.name}");
+      }
     }
 
     return result;

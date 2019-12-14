@@ -67,6 +67,7 @@ Brief summary/description of the plugin.
               schemaGenerator = ref('schemaGenerator')
             }
 
+            // https://github.com/graphql-java/graphql-java/issues/1301
             graphQLSchema(graphQLSchemaFactory: "generate")
 
             // install the graphql object in the global context so other components can access
