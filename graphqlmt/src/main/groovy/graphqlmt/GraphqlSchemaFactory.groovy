@@ -7,7 +7,9 @@ import groovy.util.logging.Slf4j
 import graphql.language.ObjectTypeDefinition;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.TypeDefinitionRegistry;
 
@@ -15,6 +17,8 @@ import static graphql.schema.GraphQLArgument.newArgument
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import static graphql.schema.GraphQLList.list
 import static graphql.schema.GraphQLObjectType.newObject
+
+
 
 
 @Slf4j
@@ -49,6 +53,13 @@ class GraphqlSchemaFactory implements GrailsApplicationAware {
       //                           .description(getOperation.description)
       //                           .dataFetcher(new InterceptingDataFetcher(entity, serviceManager, queryInterceptorInvoker, GET, getFetcher))
 
+      // Lets get the type definition for the given entity
+      GraphQLOutputType objectType = getQueryType(entity, GraphQLPropertyType.OUTPUT)
+
+      GraphQLFieldDefinition.Builder b = new GraphQLFieldDefinition.Builder()
+      b.name('wibblexyz')
+      // We need to add a field to the query object for each domain class we wish to expose - given the Widget domain we may want to expose query { widget 
+      queryType.field(b.build());
     }
 
 
@@ -62,5 +73,10 @@ class GraphqlSchemaFactory implements GrailsApplicationAware {
     // result = schemaGenerator.makeExecutableSchema(typeRegistry, wiring_builder.build());
 
     return result;
+  }
+
+  // see  https://github.com/graphql-java/graphql-java/blob/master/src/main/java/graphql/schema/idl/RuntimeWiring.java
+  private GraphQLOutputType getQueryType(GrailsClass gc, GraphQLPropertyType type) {
+    // Return the type if we already know about it otherwise register it
   }
 }
