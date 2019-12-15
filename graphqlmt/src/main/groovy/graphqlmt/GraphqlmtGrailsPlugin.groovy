@@ -54,24 +54,25 @@ Brief summary/description of the plugin.
 
 
     Closure doWithSpring() { {->
-            // TODO Implement runtime spring config (optional)
 
-            // Generate a graphql schema
-            // graphQLSchema(graphQLSchemaGenerator: "generate")
-            typeRegistry(TypeDefinitionRegistry)
+            // schemaGenerator(SchemaGenerator)
 
-            schemaGenerator(SchemaGenerator)
+            // graphQLSchemaFactory(GraphqlSchemaFactory) {
+            //   typeRegistry = ref('typeRegistry')
+            //   schemaGenerator = ref('schemaGenerator')
+            // }
 
-            graphQLSchemaFactory(GraphqlSchemaFactory) {
-              typeRegistry = ref('typeRegistry')
-              schemaGenerator = ref('schemaGenerator')
+            sdlFactory(SDLFactory)
+
+            graphqlConfigManager(GraphqlConfigManager) {
+              sdlFactory = ref('sdlFactory');
             }
 
             // https://github.com/graphql-java/graphql-java/issues/1301
-            graphQLSchema(graphQLSchemaFactory: "generate")
+            // typeRegistry(sdlFactory: "generate")
 
             // install the graphql object in the global context so other components can access
-            graphQL(GraphQL, ref("graphQLSchema"))
+            // graphQL(GraphQL, ref("graphQLSchema"))
 
             // GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeRegistry, buildRuntimeWiring());
         }
@@ -87,6 +88,7 @@ Brief summary/description of the plugin.
         //     println("Process domain class : ${gc}");
         //     grailsApplication.mainContext.graphQLService.registerDomainClass(gc);
         // }
+        grailsApplication.mainContext.graphqlConfigManager.initialise();
     }
 
 

@@ -14,6 +14,7 @@ import graphql.schema.StaticDataFetcher;
 
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.GraphQLList
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.TypeDefinitionRegistry;
 
@@ -64,10 +65,15 @@ class GraphqlSchemaFactory implements GrailsApplicationAware {
       // We need to add a field to the query object for each domain class we wish to expose - given the Widget domain we may want to expose query { widget 
       // https://github.com/graphql-java/graphql-java/issues/1301
       queryType.field(newFieldDefinition()
+                         .name("query${dc.getName()}")
+                         .type(GraphQLList.list(GraphQLTypeReference.typeRef(dc.getName())))
+                         .dataFetcher(new StaticDataFetcher("world!")));
+    }
+
+    queryType.field(newFieldDefinition()
                          .name("hello")
                          .type(graphql.Scalars.GraphQLString)
                          .dataFetcher(new StaticDataFetcher("world!")));
-    }
 
     log.debug("Completed read of all domain classes - build schema");
 
@@ -97,6 +103,7 @@ class GraphqlSchemaFactory implements GrailsApplicationAware {
                  .field(newFieldDefinition()
                          .name("id")
                          .type(graphql.Scalars.GraphQLString)
+                         .dataFetcher(new StaticDataFetcher("world!"))
                  )
                  .build()
       typedefs[typename] = result;
@@ -104,12 +111,12 @@ class GraphqlSchemaFactory implements GrailsApplicationAware {
       def type_definition = result.getDefinition();
       log.debug("Register type for ${typename} - instanceof ${type_definition?.class?.name}");
 
-      if ( type_definition != null ) {
-        typeRegistry.add(type_definition);
-      }
-      else {
-        log.error("Type null... Should not happen. Type was ${result?.class?.name}");
-      }
+      // if ( type_definition != null ) {
+      //   typeRegistry.add(type_definition);
+      // }
+      // else {
+      //   log.error("Type null... Should not happen. Type was ${result?.class?.name}");
+      // }
     }
 
     return result;
