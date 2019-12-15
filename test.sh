@@ -23,7 +23,7 @@ curl -X "POST" "http://localhost:8080/graphql" \
      -H "Accept: application/json" \
      -H "Content-Type: application/json" -d '
 {
-  "query": "query { __schema { types { name } } }",
+  "query": "query { __schema { types { name fields { name } } } }",
   "variables":{
   }
 }'
