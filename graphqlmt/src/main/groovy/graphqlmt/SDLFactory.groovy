@@ -25,7 +25,7 @@ class SDLFactory implements GrailsApplicationAware {
 
   GrailsApplication grailsApplication
 
-  private Map domainClasses = [:]
+  public Map domainClasses = [:]
 
 
   TypeDefinitionRegistry generate() {
@@ -60,11 +60,12 @@ type QueryType {
 
   /**
    * iterate over domain classes and build any finder methods we want to expose to the query type
+   * SeeAlso https://atheros.ai/blog/graphql-list-how-to-use-arrays-in-graphql-schema
    */
   public buildQueryTypeFields() {
     StringWriter sw = new StringWriter();
     domainClasses.each { key, value ->
-	sw.write("  find${key}UsingLQS(luceneQueryString: String) : ${key}\n");
+	sw.write("  find${key}UsingLQS(luceneQueryString: String) : [${key}]\n");
     }
     return sw.toString();
   }
