@@ -82,6 +82,10 @@ type QueryType {
   }
 
   public void writeDomainClassProperties(StringWriter sw, PersistentEntity dc) {
+
+    log.debug("composite identity ${dc.getCompositeIdentity()}");
+    log.debug("composite identity ${dc.getIdentity()}");
+
     log.debug("writeDomainClassProperties(${dc})");
     dc.getPersistentProperties().each { pp ->
       log.debug("${pp}");
