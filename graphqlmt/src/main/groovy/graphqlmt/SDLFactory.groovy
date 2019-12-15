@@ -33,7 +33,7 @@ class SDLFactory implements GrailsApplicationAware {
     String sdl = buildSDL();
     log.debug("Generated schema:\n\n${sdl}\n\nParsing...\n");
     SchemaParser sp = new SchemaParser();
-    sp.parse(sdl);
+    result = sp.parse(sdl);
     return result;
   }
 
@@ -47,11 +47,7 @@ class SDLFactory implements GrailsApplicationAware {
 
     StringWriter sw = new StringWriter();
     sw.write('''
-schema {
-  query: QueryType
-}
-
-type QueryType {
+type Query {
 '''+buildQueryTypeFields()+'''}
 
 '''+buildTypeDefinitions())
@@ -89,8 +85,24 @@ type QueryType {
 
     log.debug("writeDomainClassProperties(${dc})");
     dc.getPersistentProperties().each { pp ->
-      log.debug("${pp}");
+      log.debug("${pp} ${pp.getName()} ${pp.getType()} ${convertType(pp.getType())}");
+      sw.write("  ${pp.getName()}: ${convertType(pp.getType())}\n".toString());
     }
+  }
+
+  public String convertType(java.lang.Class<?> c) {
+
+    String result = null;
+
+    switch ( c ) {
+      case String.class:
+        log.debug("It's a string");
+        result = 'String';
+      default:
+        log.debug("unhandled type ${c}");
+        result = 'String';
+    }
+    return result;
   }
 
 }

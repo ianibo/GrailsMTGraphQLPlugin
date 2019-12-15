@@ -13,7 +13,7 @@ import graphql.schema.idl.TypeDefinitionRegistry;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.TypeRuntimeWiring;
-
+import graphql.schema.GraphQLSchema 
 import graphql.GraphQL
 import groovy.util.logging.Slf4j
 
@@ -40,7 +40,8 @@ class GraphqlConfigManager implements GrailsApplicationAware {
     
      RuntimeWiring runtimeWiring = buildWiring();
      SchemaGenerator schemaGenerator = new SchemaGenerator();
-     this.graphQL = schemaGenerator.makeExecutableSchema(tdl, runtimeWiring);
+     GraphQLSchema schema = schemaGenerator.makeExecutableSchema(tdl, runtimeWiring);
+     this.graphQL = GraphQL.newGraphQL(schema).build();
   }
 
   private RuntimeWiring buildWiring() {
