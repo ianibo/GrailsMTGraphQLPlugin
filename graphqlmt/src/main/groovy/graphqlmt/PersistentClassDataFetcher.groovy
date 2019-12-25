@@ -22,11 +22,11 @@ import graphql.schema.DataFetchingEnvironment;
  * This class holds the various GraphQL artefacts that need to be configured after applicationContext initialisation
  */
 @Slf4j
-class PersistentClassDataFetcher<T> implements DataFetcher<T> {
+class PersistentClassDataFetcher implements DataFetcher {
 
-  public T get(DataFetchingEnvironment environment) {
-    log.debug("PersistentClassDataFetcher<${T}> ${environment}");
-    return T.list();
+  public Object get(DataFetchingEnvironment environment) {
+    log.debug("PersistentClassDataFetcher ${environment}");
+    return 'ThisIsAString';
   }
 
 }

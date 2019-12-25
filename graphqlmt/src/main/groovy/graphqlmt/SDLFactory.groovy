@@ -29,11 +29,18 @@ class SDLFactory implements GrailsApplicationAware {
 
 
   TypeDefinitionRegistry generate() {
+    // https://github.com/graphql-java/graphql-java/blob/master/src/main/java/graphql/schema/idl/TypeDefinitionRegistry.java
     TypeDefinitionRegistry result = null;
     String sdl = buildSDL();
     log.debug("Generated schema:\n\n${sdl}\n\nParsing...\n");
     SchemaParser sp = new SchemaParser();
-    sp.parse(sdl);
+    result = sp.parse(sdl);
+
+    // After parsing, we should have some types:
+    result.types.values().each { typeentry ->
+      log.debug("${typeentry}")
+    };
+
     return result;
   }
 
@@ -46,12 +53,11 @@ class SDLFactory implements GrailsApplicationAware {
     }
 
     StringWriter sw = new StringWriter();
+    //schema {
+    //  query: Query
+    //}
     sw.write('''
-schema {
-  query: QueryType
-}
-
-type QueryType {
+type Query {
 '''+buildQueryTypeFields()+'''}
 
 '''+buildTypeDefinitions())

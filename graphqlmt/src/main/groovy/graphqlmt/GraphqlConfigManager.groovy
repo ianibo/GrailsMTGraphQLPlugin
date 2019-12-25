@@ -6,18 +6,14 @@ import grails.core.support.GrailsApplicationAware
 import groovy.util.logging.Slf4j
 import grails.util.GrailsNameUtils;
 
-import org.grails.datastore.mapping.model.PersistentEntity
+// import org.grails.datastore.mapping.model.PersistentEntity
 
-import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.RuntimeWiring;
-import graphql.schema.idl.TypeRuntimeWiring;
-
+import graphql.schema.GraphQLSchema;
 import graphql.GraphQL
 import groovy.util.logging.Slf4j
-
-
 
 /**
  * because of changes in the grails ecosystem domain class introspection can't happen until after
@@ -37,10 +33,10 @@ class GraphqlConfigManager implements GrailsApplicationAware {
   public void initialise() {
     log.debug("GraphqlConfigManager::initialise");
     TypeDefinitionRegistry tdl = sdlFactory.generate();
-    
-     RuntimeWiring runtimeWiring = buildWiring();
-     SchemaGenerator schemaGenerator = new SchemaGenerator();
-     this.graphQL = schemaGenerator.makeExecutableSchema(tdl, runtimeWiring);
+    RuntimeWiring runtimeWiring = buildWiring();
+    SchemaGenerator schemaGenerator = new SchemaGenerator();
+    GraphQLSchema gs = schemaGenerator.makeExecutableSchema(tdl, runtimeWiring);
+    this.graphQL =  GraphQL.newGraphQL(gs).build();
   }
 
   private RuntimeWiring buildWiring() {
@@ -54,7 +50,7 @@ class GraphqlConfigManager implements GrailsApplicationAware {
       // rwb.type(RuntimeWiring.newTypeWiring("Query").dataFetcher("find${key}UsingLQS".toString(), (dataFetchingEnvironment) -> {
       //   println("Hello");
       // }
-      rwb.type( TypeRuntimeWiring.newTypeWiring("Query").dataFetcher("find${key}UsingLQS".toString(), new PersistentClassDataFetcher()))
+      // rwb.type( TypeRuntimeWiring.newTypeWiring("Query").dataFetcher("find${key}UsingLQS".toString(), new PersistentClassDataFetcher()))
     }
 
     // .type(newTypeWiring("Query") .dataFetcher("findWidgetUsingLQS", new PersistentClassDataFetcher<Widget>()))

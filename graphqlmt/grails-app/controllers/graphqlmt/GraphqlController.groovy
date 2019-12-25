@@ -15,7 +15,9 @@ import grails.converters.JSON
 class GraphqlController {
 
   static responseFormats = ['json', 'xml']
-  GraphQL graphQL
+  // GraphQL graphQL
+  GraphqlConfigManager graphqlConfigManager;
+
 
   // https://github.com/grails/gorm-graphql/blob/master/plugin/grails-app/controllers/org/grails/gorm/graphql/plugin/GraphqlController.groovy
   def index() {
@@ -51,7 +53,7 @@ class GraphqlController {
     log.debug("Process query: ${query}");
     Map<String, Object> result = new LinkedHashMap<>()
 
-    ExecutionResult executionResult = graphQL.execute(ExecutionInput.newExecutionInput()
+    ExecutionResult executionResult = graphqlConfigManager.graphQL.execute(ExecutionInput.newExecutionInput()
                  .query(query)
                  .operationName(operationName)
                  .context(context)
