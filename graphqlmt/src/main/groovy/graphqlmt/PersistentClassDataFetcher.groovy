@@ -15,6 +15,9 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment;
 
+import org.grails.datastore.gorm.GormEnhancer
+import org.grails.datastore.gorm.GormStaticApi
+
 
 /**
  * because of changes in the grails ecosystem domain class introspection can't happen until after
@@ -25,25 +28,28 @@ import graphql.schema.DataFetchingEnvironment;
 @Slf4j
 class PersistentClassDataFetcher implements DataFetcher {
 
-  private Class domainClass = null;
+  private org.grails.datastore.mapping.model.PersistentEntity domainClass = null;
 
   public PersistentClassDataFetcher() {
   }
 
-  public PersistentClassDataFetcher(Class domainClass) {
+  public PersistentClassDataFetcher(org.grails.datastore.mapping.model.PersistentEntity domainClass) {
     this.domainClass = domainClass;
   }
 
   public Object get(DataFetchingEnvironment environment) {
-    List result = [];
+    List result = null;
     // println("PersistentClassDataFetcher::get(${environment})");
-    log.debug("PersistentClassDataFetcher ${domainClass}/${environment}");
+    log.debug("PersistentClassDataFetcher ${domainClass.class.name}");
+    // log.debug("PersistentClassDataFetcher ${domainClass}/${environment}");
+
+    // GormStaticApi staticApi = GormEnhancer.findStaticApi(domainClass.javaClass)
 
     log.debug("Call domainClass.list()");
-    def qr = domainClass.list()
-    log.debug("qr: ${qr}");
+    // def qr = staticApi.list()
+    result = domainClass.getJavaClass().wibble()
+    log.debug("result: ${result}");
  
-    result.add([widgetName:'ThisIsAString']);
     return result;
   }
 
