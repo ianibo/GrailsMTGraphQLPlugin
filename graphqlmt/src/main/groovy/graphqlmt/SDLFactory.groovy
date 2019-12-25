@@ -85,7 +85,12 @@ type Query {
   public void writeDomainClassProperties(StringWriter sw, PersistentEntity dc) {
 
     log.debug("composite identity ${dc.getCompositeIdentity()}");
-    log.debug("composite identity ${dc.getIdentity()}");
+    org.grails.datastore.mapping.model.types.Identity id = dc.getIdentity()
+    if ( id != null ) {
+      log.debug("add normal identity ${dc.getIdentity()}");
+      // sw.write("  ${id.getName()}: ${convertType(id.getType())}\n".toString());
+      sw.write("  ${id.getName()}: ID\n".toString());
+    }
 
     log.debug("writeDomainClassProperties(${dc})");
     dc.getPersistentProperties().each { pp ->
@@ -102,6 +107,8 @@ type Query {
       case String.class:
         log.debug("It's a string");
         result = 'String';
+      case Long.class:
+        result = 'Int';
       default:
         log.debug("unhandled type ${c}");
         result = 'String';

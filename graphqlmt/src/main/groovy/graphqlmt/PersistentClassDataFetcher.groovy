@@ -20,13 +20,17 @@ import graphql.schema.DataFetchingEnvironment;
  * because of changes in the grails ecosystem domain class introspection can't happen until after
  * gorm is initialised. This means code that used to execute in doWithSpring needs to move to doWithApplicationConext
  * This class holds the various GraphQL artefacts that need to be configured after applicationContext initialisation
+ * @See https://github.com/graphql-java/graphql-java/blob/master/src/main/java/graphql/schema/DataFetcher.java
  */
 @Slf4j
 class PersistentClassDataFetcher implements DataFetcher {
 
   public Object get(DataFetchingEnvironment environment) {
+    List result = [];
+    // println("PersistentClassDataFetcher::get(${environment})");
     log.debug("PersistentClassDataFetcher ${environment}");
-    return 'ThisIsAString';
+    result.add([widgetName:'ThisIsAString']);
+    return result;
   }
 
 }

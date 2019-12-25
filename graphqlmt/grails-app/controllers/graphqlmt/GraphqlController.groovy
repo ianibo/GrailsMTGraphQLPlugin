@@ -61,6 +61,7 @@ class GraphqlController {
                  .variables(variables)
                  .build())
 
+    log.debug("Got execution result: ${executionResult} ${executionResult.data}");
     if (executionResult.errors.size() > 0) {
       result.put('errors', executionResult.errors)
     }
