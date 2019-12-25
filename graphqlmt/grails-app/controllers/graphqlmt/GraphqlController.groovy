@@ -11,7 +11,10 @@ import org.springframework.context.MessageSource
 import graphql.GraphQL
 import groovy.transform.CompileStatic
 import grails.converters.JSON
+import grails.gorm.multitenancy.CurrentTenant
+import grails.gorm.transactions.Transactional
 
+@CurrentTenant
 class GraphqlController {
 
   static responseFormats = ['json', 'xml']

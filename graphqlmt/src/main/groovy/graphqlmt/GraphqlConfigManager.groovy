@@ -45,13 +45,13 @@ class GraphqlConfigManager implements GrailsApplicationAware {
  
     // Iterate through each domain class
     sdlFactory.domainClasses.each { key, value ->
-      log.debug("Add PersistentClassDataFetcher for ${key} / ${value} / ${value.class}");
+      log.debug("Add PersistentClassDataFetcher for ${key} / ${value} / ${value.class} / ${value.getJavaClass()}");
       // rwb.type(newTypeWiring("Query").dataFetcher("find${key}UsingLQS".toString(), new PersistentClassDataFetcher<value.class>()))
       // rwb.type(RuntimeWiring.newTypeWiring("Query").dataFetcher("find${key}UsingLQS".toString(), new PersistentClassDataFetcher()))
       // rwb.type(RuntimeWiring.newTypeWiring("Query").dataFetcher("find${key}UsingLQS".toString(), (dataFetchingEnvironment) -> {
       //   println("Hello");
       // }
-      rwb.type( TypeRuntimeWiring.newTypeWiring("Query").dataFetcher("find${key}UsingLQS".toString(), new PersistentClassDataFetcher()))
+      rwb.type( TypeRuntimeWiring.newTypeWiring("Query").dataFetcher("find${key}UsingLQS".toString(), new PersistentClassDataFetcher(value.getJavaClass())))
     }
 
     // .type(newTypeWiring("Query") .dataFetcher("findWidgetUsingLQS", new PersistentClassDataFetcher<Widget>()))

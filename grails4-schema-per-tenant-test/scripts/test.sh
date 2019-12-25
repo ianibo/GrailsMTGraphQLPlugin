@@ -14,6 +14,8 @@
 # 
 
 
+curl -X "POST" --header "X-TENANT: test" "http://localhost:8080/admin/createTenant"
+
 curl -X "POST" "http://localhost:8080/graphql" \
      --header "X-TENANT: test" \
      -H "Accept: application/json" \

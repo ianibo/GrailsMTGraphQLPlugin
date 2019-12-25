@@ -25,10 +25,24 @@ import graphql.schema.DataFetchingEnvironment;
 @Slf4j
 class PersistentClassDataFetcher implements DataFetcher {
 
+  private Class domainClass = null;
+
+  public PersistentClassDataFetcher() {
+  }
+
+  public PersistentClassDataFetcher(Class domainClass) {
+    this.domainClass = domainClass;
+  }
+
   public Object get(DataFetchingEnvironment environment) {
     List result = [];
     // println("PersistentClassDataFetcher::get(${environment})");
-    log.debug("PersistentClassDataFetcher ${environment}");
+    log.debug("PersistentClassDataFetcher ${domainClass}/${environment}");
+
+    log.debug("Call domainClass.list()");
+    def qr = domainClass.list()
+    log.debug("qr: ${qr}");
+ 
     result.add([widgetName:'ThisIsAString']);
     return result;
   }

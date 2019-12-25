@@ -41,7 +41,7 @@ class SpttSchemaHandler implements SchemaHandler {
     void useSchema(Connection connection, String name) {
         // log.debug("useSchema");
         String useStatement = String.format(useSchemaStatement, name.toUpperCase())
-        // log.debug("Executing SQL Set Schema Statement: ${useStatement}")
+        log.debug("Executing SQL Set Schema Statement: ${useStatement}")
 
         try {
           connection
