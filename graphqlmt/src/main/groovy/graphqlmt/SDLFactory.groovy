@@ -35,12 +35,6 @@ class SDLFactory implements GrailsApplicationAware {
     log.debug("Generated schema:\n\n${sdl}\n\nParsing...\n");
     SchemaParser sp = new SchemaParser();
     result = sp.parse(sdl);
-
-    // After parsing, we should have some types:
-    result.types.values().each { typeentry ->
-      log.debug("${typeentry}")
-    };
-
     return result;
   }
 
@@ -95,8 +89,24 @@ type Query {
 
     log.debug("writeDomainClassProperties(${dc})");
     dc.getPersistentProperties().each { pp ->
-      log.debug("${pp}");
+      log.debug("${pp} ${pp.getName()} ${pp.getType()} ${convertType(pp.getType())}");
+      sw.write("  ${pp.getName()}: ${convertType(pp.getType())}\n".toString());
     }
+  }
+
+  public String convertType(java.lang.Class<?> c) {
+
+    String result = null;
+
+    switch ( c ) {
+      case String.class:
+        log.debug("It's a string");
+        result = 'String';
+      default:
+        log.debug("unhandled type ${c}");
+        result = 'String';
+    }
+    return result;
   }
 
 }

@@ -12,6 +12,7 @@ import graphql.schema.idl.TypeDefinitionRegistry;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.idl.TypeRuntimeWiring;
 import graphql.GraphQL
 import groovy.util.logging.Slf4j
 
