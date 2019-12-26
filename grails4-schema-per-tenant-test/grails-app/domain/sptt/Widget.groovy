@@ -6,8 +6,9 @@ import grails.gorm.annotation.Entity
 
 // 
 // public class Widget implements MultiTenant<Widget> {
-@Entity
-class Widget implements GormEntity<Widget>, MultiTenant<Widget> {
+// class Widget implements GormEntity<Widget>, MultiTenant<Widget> {
+// @Entity
+class Widget implements MultiTenant<Widget> {
 
   String id
   String widgetName
@@ -24,6 +25,14 @@ class Widget implements GormEntity<Widget>, MultiTenant<Widget> {
               version column: 'wid_version'
            widgetName column: 'wid_name'
   }
+
+  static hasMany = [
+    lines: WidgetLine
+  ]
+  
+  static mappedBy = [
+    lines:'owner'
+  ]
 
   static constraints = {
     widgetName(nullable:false)

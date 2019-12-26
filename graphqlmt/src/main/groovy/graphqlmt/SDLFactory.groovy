@@ -7,6 +7,7 @@ import groovy.util.logging.Slf4j
 import grails.util.GrailsNameUtils;
 
 import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.PersistentProperty
 
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
@@ -87,31 +88,54 @@ type Query {
     log.debug("composite identity ${dc.getCompositeIdentity()}");
     org.grails.datastore.mapping.model.types.Identity id = dc.getIdentity()
     if ( id != null ) {
-      log.debug("add normal identity ${dc.getIdentity()}");
-      // sw.write("  ${id.getName()}: ${convertType(id.getType())}\n".toString());
+      log.debug("add normal identity ${dc.getIdentity()} / ${id.getName()}");
       sw.write("  ${id.getName()}: ID\n".toString());
     }
 
     log.debug("writeDomainClassProperties(${dc})");
-    dc.getPersistentProperties().each { pp ->
-      log.debug("${pp} ${pp.getName()} ${pp.getType()} ${convertType(pp.getType())}");
-      sw.write("  ${pp.getName()}: ${convertType(pp.getType())}\n".toString());
+    // @See https://gorm.grails.org/6.0.x/api/org/grails/datastore/mapping/model/PersistentProperty.html
+    dc.getPersistentProperties().each { PersistentProperty pp ->
+      log.debug(" -> Process persistent property: ${pp} ${pp.getName()} type:${pp.getType()} ${pp.class.name}");
+      String tp = convertType(pp, pp.getType());
+      log.debug("   -> type conversion = ${tp}");
+      sw.write("  ${pp.getName()}: ${tp}\n".toString());
     }
   }
 
-  public String convertType(java.lang.Class<?> c) {
+  public String convertType(PersistentProperty pp, java.lang.Class<?> c) {
 
     String result = null;
 
-    switch ( c ) {
-      case String.class:
-        log.debug("It's a string");
-        result = 'String';
-      case Long.class:
-        result = 'Int';
-      default:
-        log.debug("unhandled type ${c}");
-        result = 'String';
+    if ( pp instanceof org.grails.datastore.mapping.model.types.Association ) {
+      log.debug("process association ${pp.class.name}");
+      if ( pp instanceof org.grails.datastore.mapping.model.types.OneToMany ) {
+        PersistentEntity associated_entity = pp.getAssociatedEntity();
+        result = "[${associated_entity.getJavaClass().getSimpleName()}]".toString();
+      }
+      else if ( pp instanceof org.grails.datastore.mapping.model.types.ManyToOne ) {
+        PersistentEntity associated_entity = pp.getAssociatedEntity();
+        result = associated_entity.getJavaClass().getSimpleName();
+      }
+      else {
+        log.warn("Unhandled association type ${pp}");
+      }
+
+    }
+    else {
+      log.debug("Handle instance of ${pp.class.name}");
+      switch ( c ) {
+        case String.class:
+          log.debug("It's a string");
+          result = 'String';
+        case Long.class:
+          result = 'Int';
+        case Set.class:
+          log.debug("Handling a set");
+          result = null;
+        default:
+          log.debug("unhandled type ${c}");
+          result = 'String';
+      }
     }
     return result;
   }
