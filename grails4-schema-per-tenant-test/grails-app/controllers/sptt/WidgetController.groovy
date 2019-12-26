@@ -9,6 +9,13 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class WidgetController {
 
+  def index() {
+    Widget.withTransaction {
+      render Widget.list() as JSON;
+    }
+  }
+
+  @CurrentTenant
   def createWidget(String name) {
     def result=[status:'SURE']
 
@@ -21,6 +28,7 @@ class WidgetController {
     render result as JSON
   }
 
+  @CurrentTenant
   def test() {
     log.debug("test");
     def result = [ result: 'hello' ]
