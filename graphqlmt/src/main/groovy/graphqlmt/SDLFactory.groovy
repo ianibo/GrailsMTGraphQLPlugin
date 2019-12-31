@@ -66,7 +66,7 @@ type Query {
   public buildQueryTypeFields() {
     StringWriter sw = new StringWriter();
     domainClasses.each { key, value ->
-	sw.write("  find${key}UsingLQS(luceneQueryString: String) : [${key}]\n");
+	sw.write("  find${key}UsingLQS(luceneQueryString: String) : ${key}PagedResult\n");
     }
     return sw.toString();
   }

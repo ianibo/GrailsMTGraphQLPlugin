@@ -48,7 +48,10 @@ class PersistentClassDataFetcher implements DataFetcher {
     log.debug("Call domainClass.list()");
     // def qr = staticApi.list()
     // result = domainClass.getJavaClass().wibble()
-    result = domainClass.getJavaClass().list();
+    result = [ 
+               totalCount: 0,
+               results: domainClass.getJavaClass().list()
+             ];
     log.debug("result: ${result}");
  
     return result;
