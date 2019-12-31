@@ -82,8 +82,8 @@ type Query {
 
       // Do we want to auto define XXQueryResult to let us wrap the array with some pagination properties
       sw.write("type ${key}PagedResult {\n");
-      sw.write("  totalCount Int\n");
-      sw.write("  results [${key}]\n");
+      sw.write("  totalCount: Int\n");
+      sw.write("  results: [${key}]\n");
       sw.write("}\n\n");
     }
     return sw.toString();

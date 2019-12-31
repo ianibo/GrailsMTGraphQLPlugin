@@ -38,7 +38,7 @@ class PersistentClassDataFetcher implements DataFetcher {
   }
 
   public Object get(DataFetchingEnvironment environment) {
-    List result = null;
+    Map result = null;
     // println("PersistentClassDataFetcher::get(${environment})");
     log.debug("PersistentClassDataFetcher ${domainClass.class.name}");
     // log.debug("PersistentClassDataFetcher ${domainClass}/${environment}");
@@ -52,7 +52,8 @@ class PersistentClassDataFetcher implements DataFetcher {
                totalCount: 0,
                results: domainClass.getJavaClass().list()
              ];
-    log.debug("result: ${result}");
+
+    log.debug("get completetd with result: ${result}");
  
     return result;
   }

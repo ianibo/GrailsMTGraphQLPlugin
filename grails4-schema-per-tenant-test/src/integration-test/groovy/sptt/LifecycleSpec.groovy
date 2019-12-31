@@ -118,13 +118,14 @@ class LifecycleSpec extends Specification {
         // request.headers.'Content-Type'='application/json'
         request.contentType = JSON[0]
         request.body = [
-          'query': "query { findWidgetUsingLQS(luceneQueryString:\"title:${qry}\") { widgetName } }".toString(),
+          'query': "query { findWidgetUsingLQS(luceneQueryString:\"title:${qry}\") { totalCount results { widgetName } } }".toString(),
           'variables':[:]
         ]
         response.when(200) { FromServer fs, Object body ->
           logger.debug("graphql query returns 200 ${body}");
           // TestTenantG should have 4 widgets
-          assert body.data.findWidgetUsingLQS.size==5
+          assert body.data.findWidgetUsingLQS.totalCount==0
+          assert body.data.findWidgetUsingLQS.results.size==5
           status='OK'
         }
       }
