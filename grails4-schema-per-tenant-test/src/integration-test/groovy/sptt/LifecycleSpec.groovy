@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import groovyx.net.http.HttpBuilder
 import groovyx.net.http.FromServer
+import static groovyx.net.http.ContentTypes.JSON
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 
@@ -73,7 +74,7 @@ class LifecycleSpec extends Specification {
 
       def httpBin = HttpBuilder.configure {
         request.uri = 'http://localhost:'+serverPort
-         request.headers['X-TENANT'] = tenantid
+        request.headers['X-TENANT'] = tenantid
       }
 
       def result = httpBin.get {
@@ -98,5 +99,42 @@ class LifecycleSpec extends Specification {
       'TestTenantG' | 'Test Widget E Tenant G'
       'TestTenantF' | 'Test Widget A Tenant F'
   }
- 
+
+  void "test Graphql Widget"(tenantid, qry) {
+    when:"We post a new tenant request to the admin controller"
+
+      logger.debug("graphql query (${qry}) for tenant ${tenantid}");
+
+      String status = null;
+
+      def httpBin = HttpBuilder.configure {
+        request.uri = 'http://localhost:'+serverPort
+        request.headers['X-TENANT'] = tenantid
+      }
+
+      def result = httpBin.post {
+        request.uri.path = '/graphql'
+        request.headers.'accept'='application/json'
+        // request.headers.'Content-Type'='application/json'
+        request.contentType = JSON[0]
+        request.body = [
+          'query': "query { findWidgetUsingLQS(luceneQueryString:\"title:${qry}\") { widgetName } }".toString(),
+          'variables':[:]
+        ]
+        response.when(200) { FromServer fs, Object body ->
+          logger.debug("graphql query returns 200 ${body}");
+          // TestTenantG should have 4 widgets
+          assert body.data.findWidgetUsingLQS.size==5
+          status='OK'
+        }
+      }
+      logger.debug("Result: ${result}");
+
+    then:"The response is correct"
+      status=='OK'
+
+    where:
+      tenantid | qry
+      'TestTenantG' | 'test'
+  }
 }
