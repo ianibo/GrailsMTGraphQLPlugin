@@ -58,6 +58,11 @@ type Query {
 type Mutation {
 '''+buildMutations()+''' }
 
+type Error {
+  field: String
+  message: String
+}
+
 '''+buildTypeDefinitions())
     return sw.toString();
   }
@@ -127,6 +132,11 @@ type Mutation {
       log.debug("   -> type conversion = ${tp}");
       sw.write("  ${pp.getName()}: ${tp}\n".toString());
     }
+
+    if ( !isInputType ) {
+      sw.write('  errors: [Error]\n');
+    }
+
   }
 
   public String convertType(PersistentProperty pp, java.lang.Class<?> c, boolean isInputType) {
