@@ -40,19 +40,21 @@ class PersistentClassCreateMutation implements DataFetcher {
   }
 
   public Object get(DataFetchingEnvironment environment) {
-    Map result = null;
+    Object result = null;
     // println("PersistentClassDataFetcher::get(${environment})");
     log.debug("PersistentClassCreateMutation ${domainClass.class.name}");
     // log.debug("PersistentClassDataFetcher ${domainClass}/${environment}");
 
     // GormStaticApi staticApi = GormEnhancer.findStaticApi(domainClass.javaClass)
 
-    log.debug("Call domainClass.list()");
-    // def qr = staticApi.list()
-    // result = domainClass.getJavaClass().wibble()
-    result = domainClass.newInstance()
+    log.debug("Call domainClass.newInstance()");
+    domainClass.getJavaClass().withTransaction {
+      result = domainClass.newInstance()
+      result.widgetName = 'test'
+      // now use data binding to map environment.p_classname into result
+      result.save(flush:true, failOnError:true);
+    }
 
-    // now use data binding to map environment.p_classname into result
 
     log.debug("get completetd with result: ${result}");
     return result;

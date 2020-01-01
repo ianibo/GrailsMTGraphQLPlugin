@@ -138,4 +138,45 @@ class LifecycleSpec extends Specification {
       tenantid | qry
       'TestTenantG' | 'test'
   }
+
+  void "test Create Mutation for Widget"(tenantid, record) {
+    when:"We post a new widget mutation"
+
+      logger.debug("graphql mutation (${record}) for tenant ${tenantid}");
+
+      String status = null;
+
+      def httpBin = HttpBuilder.configure {
+        request.uri = 'http://localhost:'+serverPort
+        request.headers['X-TENANT'] = tenantid
+      }
+
+      def result = httpBin.post {
+        request.uri.path = '/graphql'
+        request.headers.'accept'='application/json'
+        // request.headers.'Content-Type'='application/json'
+        request.contentType = JSON[0]
+        request.body =  [
+          // "query" : 'mutation($widget: WidgetInputType) { createWidget(widget: $widget) { id widgetName errors { field message } } }',
+          "query" : 'mutation($widget: WidgetInputType) { createWidget(widget: $widget) { id widgetName } }',
+          "variables": [
+            "widget" : record
+          ]
+        ]
+    
+        response.when(200) { FromServer fs, Object body ->
+          logger.debug("graphql mutation returns 200 ${body}");
+          status='OK'
+        }
+      }
+      logger.debug("Result: ${result}");
+
+    then:"The response is correct"
+      status=='OK'
+
+    where:
+      tenantid | record
+      'TestTenantG' | [ widgetName: 'Widget 334 - From createWidget mutation' ]
+  }
+
 }
