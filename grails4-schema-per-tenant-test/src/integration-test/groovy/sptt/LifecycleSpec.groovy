@@ -166,6 +166,8 @@ class LifecycleSpec extends Specification {
     
         response.when(200) { FromServer fs, Object body ->
           logger.debug("graphql mutation returns 200 ${body}");
+          assert body.data.createWidget.widgetName == record.widgetName
+          assert body.data.createWidget.id != null
           status='OK'
         }
       }
@@ -176,7 +178,8 @@ class LifecycleSpec extends Specification {
 
     where:
       tenantid | record
-      'TestTenantG' | [ widgetName: 'Widget 334 - From createWidget mutation' ]
+      'TestTenantG' | [ widgetName: 'Widget 334 - From createWidget mutation - TennantG' ]
+      'TestTenantF' | [ widgetName: 'Widget 335 - From createWidget mutation - TennantF' ]
   }
 
 }

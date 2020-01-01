@@ -18,6 +18,8 @@ import graphql.schema.DataFetchingEnvironment;
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormStaticApi
 
+import grails.web.databinding.DataBindingUtils
+
 
 /**
  * because of changes in the grails ecosystem domain class introspection can't happen until after
@@ -41,18 +43,31 @@ class PersistentClassCreateMutation implements DataFetcher {
 
   public Object get(DataFetchingEnvironment environment) {
     Object result = null;
-    // println("PersistentClassDataFetcher::get(${environment})");
-    log.debug("PersistentClassCreateMutation ${domainClass.class.name}");
-    // log.debug("PersistentClassDataFetcher ${domainClass}/${environment}");
+    log.debug("PersistentClassCreateMutation domain class: ${domainClass}");
 
-    // GormStaticApi staticApi = GormEnhancer.findStaticApi(domainClass.javaClass)
+    // environment
+    String class_simple_name = domainClass.getJavaClass().getSimpleName()
+    String param_name = class_simple_name.toLowerCase();
 
-    log.debug("Call domainClass.newInstance()");
-    domainClass.getJavaClass().withTransaction {
-      result = domainClass.newInstance()
-      result.widgetName = 'test'
-      // now use data binding to map environment.p_classname into result
-      result.save(flush:true, failOnError:true);
+    log.debug("Param name will be ${param_name} class name is ${class_simple_name}");
+
+    log.debug("\n\nEnvArgs : ${environment.getArguments()}\n\n");
+
+    if ( environment.containsArgument(param_name) ) {
+      log.debug("Environment contains ${param_name}");
+
+      Object p = environment.getArgument(param_name)
+      log.debug("got param ${param_name} :  ${p}");
+      log.debug("Call domainClass.newInstance()");
+      domainClass.getJavaClass().withTransaction {
+        // now use data binding to map environment.param into result
+        result = domainClass.newInstance()
+        DataBindingUtils.bindObjectToInstance(result, p);
+        result.save(flush:true, failOnError:true);
+      }
+    }
+    else {
+      log.error("unable to locate param ${param_name} in environment arguments ${environment.getArguments()}");
     }
 
 
