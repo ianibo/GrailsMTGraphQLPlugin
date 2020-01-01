@@ -43,22 +43,12 @@ class PersistentClassCreateMutation implements DataFetcher {
 
   public Object get(DataFetchingEnvironment environment) {
     Object result = null;
-    log.debug("PersistentClassCreateMutation domain class: ${domainClass}");
-
+    // log.debug("PersistentClassCreateMutation domain class: ${domainClass}");
     // environment
     String class_simple_name = domainClass.getJavaClass().getSimpleName()
     String param_name = class_simple_name.toLowerCase();
-
-    log.debug("Param name will be ${param_name} class name is ${class_simple_name}");
-
-    log.debug("\n\nEnvArgs : ${environment.getArguments()}\n\n");
-
     if ( environment.containsArgument(param_name) ) {
-      log.debug("Environment contains ${param_name}");
-
       Object p = environment.getArgument(param_name)
-      log.debug("got param ${param_name} :  ${p}");
-      log.debug("Call domainClass.newInstance()");
       domainClass.getJavaClass().withTransaction {
         // now use data binding to map environment.param into result
         result = domainClass.newInstance()
@@ -70,8 +60,6 @@ class PersistentClassCreateMutation implements DataFetcher {
       log.error("unable to locate param ${param_name} in environment arguments ${environment.getArguments()}");
     }
 
-
-    log.debug("get completetd with result: ${result}");
     return result;
   }
 

@@ -6,7 +6,8 @@ class WidgetLine implements MultiTenant<WidgetLine> {
 
   String id
   String widgetLineText
-  Widget owner
+
+  static belongsTo = [ owner: Widget ]
 
   static mapping = {
                    id column: 'wl_id', generator: 'uuid2', length:36

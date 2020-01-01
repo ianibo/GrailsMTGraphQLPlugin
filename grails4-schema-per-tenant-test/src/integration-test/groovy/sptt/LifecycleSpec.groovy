@@ -158,7 +158,7 @@ class LifecycleSpec extends Specification {
         request.contentType = JSON[0]
         request.body =  [
           // "query" : 'mutation($widget: WidgetInputType) { createWidget(widget: $widget) { id widgetName errors { field message } } }',
-          "query" : 'mutation($widget: WidgetInputType) { createWidget(widget: $widget) { id widgetName } }',
+          "query" : 'mutation($widget: WidgetInputType) { createWidget(widget: $widget) { id widgetName lines { widgetLineText } } }',
           "variables": [
             "widget" : record
           ]
@@ -179,7 +179,7 @@ class LifecycleSpec extends Specification {
     where:
       tenantid | record
       'TestTenantG' | [ widgetName: 'Widget 334 - From createWidget mutation - TennantG' ]
-      'TestTenantF' | [ widgetName: 'Widget 335 - From createWidget mutation - TennantF' ]
+      'TestTenantF' | [ widgetName: 'Widget 335 - From createWidget mutation - TennantF', lines: [ [ widgetLineText:'Widget Line text 335' ] ] ]
   }
 
 }
