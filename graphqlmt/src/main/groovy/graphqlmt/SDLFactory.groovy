@@ -55,7 +55,18 @@ class SDLFactory implements GrailsApplicationAware {
 type Query {
 '''+buildQueryTypeFields()+'''}
 
+type Mutation {
+'''+buildMutations()+''' }
+
 '''+buildTypeDefinitions())
+    return sw.toString();
+  }
+
+  public buildMutations() {
+    StringWriter sw = new StringWriter();
+    domainClasses.each { key, value ->
+      sw.write("  create${key}(${key.toLowerCase()}: ${key}InputType) : ${key}\n");
+    }
     return sw.toString();
   }
 
@@ -76,7 +87,7 @@ type Query {
     StringWriter sw = new StringWriter();
     domainClasses.each { key, value ->
       sw.write("type ${key} {\n".toString());
-      writeDomainClassProperties(sw,value)
+      writeDomainClassProperties(sw,value,false)
       // sw.write("  id: String\n".toString());
       sw.write("}\n\n");
 
@@ -86,10 +97,20 @@ type Query {
       sw.write("  results: [${key}]\n");
       sw.write("}\n\n");
     }
+
+    // This is fugly - we need separate input type declarations for everything we want to pass in as an input type.. so
+    domainClasses.each { key, value ->
+      sw.write("input ${key}InputType {\n".toString());
+      writeDomainClassProperties(sw,value,true)
+      // sw.write("  id: String\n".toString());
+      sw.write("}\n\n");
+    }
+
+
     return sw.toString();
   }
 
-  public void writeDomainClassProperties(StringWriter sw, PersistentEntity dc) {
+  public void writeDomainClassProperties(StringWriter sw, PersistentEntity dc, boolean isInputType) {
 
     log.debug("composite identity ${dc.getCompositeIdentity()}");
     org.grails.datastore.mapping.model.types.Identity id = dc.getIdentity()
@@ -102,13 +123,13 @@ type Query {
     // @See https://gorm.grails.org/6.0.x/api/org/grails/datastore/mapping/model/PersistentProperty.html
     dc.getPersistentProperties().each { PersistentProperty pp ->
       log.debug(" -> Process persistent property: ${pp} ${pp.getName()} type:${pp.getType()} ${pp.class.name}");
-      String tp = convertType(pp, pp.getType());
+      String tp = convertType(pp, pp.getType(), isInputType);
       log.debug("   -> type conversion = ${tp}");
       sw.write("  ${pp.getName()}: ${tp}\n".toString());
     }
   }
 
-  public String convertType(PersistentProperty pp, java.lang.Class<?> c) {
+  public String convertType(PersistentProperty pp, java.lang.Class<?> c, boolean isInputType) {
 
     String result = null;
 
@@ -116,11 +137,13 @@ type Query {
       log.debug("process association ${pp.class.name}");
       if ( pp instanceof org.grails.datastore.mapping.model.types.OneToMany ) {
         PersistentEntity associated_entity = pp.getAssociatedEntity();
-        result = "[${associated_entity.getJavaClass().getSimpleName()}]".toString();
+        // If we're creating input typedefs, add InputType on to the end *ugh*
+        result = "[${associated_entity.getJavaClass().getSimpleName()}${isInputType?'InputType':''}]".toString();
       }
       else if ( pp instanceof org.grails.datastore.mapping.model.types.ManyToOne ) {
         PersistentEntity associated_entity = pp.getAssociatedEntity();
-        result = associated_entity.getJavaClass().getSimpleName();
+        // If we're creating input typedefs, add InputType on to the end *ugh*
+        result = "${associated_entity.getJavaClass().getSimpleName()}${isInputType?'InputType':''}".toString();
       }
       else {
         log.warn("Unhandled association type ${pp}");
