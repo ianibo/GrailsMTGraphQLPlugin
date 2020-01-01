@@ -56,6 +56,7 @@ class GraphqlConfigManager implements GrailsApplicationAware {
       // See https://www.graphql-java.com/documentation/v13/execution/
       rwb.type( TypeRuntimeWiring.newTypeWiring("Mutation").dataFetcher("create${key}".toString(), new PersistentClassCreateMutation(value)) )
       rwb.type( TypeRuntimeWiring.newTypeWiring("Mutation").dataFetcher("update${key}".toString(), new PersistentClassUpdateMutation(value)) )
+      rwb.type( TypeRuntimeWiring.newTypeWiring("Mutation").dataFetcher("delete${key}".toString(), new PersistentClassDeleteMutation(value)) )
     }
 
     // .type(newTypeWiring("Query") .dataFetcher("findWidgetUsingLQS", new PersistentClassDataFetcher<Widget>()))

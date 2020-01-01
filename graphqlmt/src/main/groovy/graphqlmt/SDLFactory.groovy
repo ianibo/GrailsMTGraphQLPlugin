@@ -63,6 +63,10 @@ type Error {
   message: String
 }
 
+type DeleteResult {
+  result: String
+}
+
 '''+buildTypeDefinitions())
     return sw.toString();
   }
@@ -72,6 +76,7 @@ type Error {
     domainClasses.each { key, value ->
       sw.write("  create${key}(${key.toLowerCase()}: ${key}InputType) : ${key}\n");
       sw.write("  update${key}(id: String) : ${key}\n");
+      sw.write("  delete${key}(id: String) : DeleteResult\n");
     }
     return sw.toString();
   }
