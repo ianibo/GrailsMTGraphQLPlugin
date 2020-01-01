@@ -71,6 +71,7 @@ type Error {
     StringWriter sw = new StringWriter();
     domainClasses.each { key, value ->
       sw.write("  create${key}(${key.toLowerCase()}: ${key}InputType) : ${key}\n");
+      sw.write("  update${key}(id: String) : ${key}\n");
     }
     return sw.toString();
   }
