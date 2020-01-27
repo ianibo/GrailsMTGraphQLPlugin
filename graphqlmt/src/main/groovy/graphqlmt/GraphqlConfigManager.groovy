@@ -54,6 +54,14 @@ class GraphqlConfigManager implements GrailsApplicationAware {
 
       rwb.type( TypeRuntimeWiring.newTypeWiring("Query").dataFetcher("find${key}UsingLQS".toString(), new PersistentClassDataFetcher(value)) )
 
+      Map graphql_config = grails.util.GrailsClassUtils.getStaticPropertyValue(value.getJavaClass(), 'graphql') as Map
+      if ( graphql_config != null ) {
+        log.debug("Class has static graphql config... process");
+        graphql_config.queries.each { k,v -> 
+          log.debug("Add query ${k} -> ${v}");
+        }
+      }
+
       // The we support List graphql.defaultFinders as a list of default finders that should be added
       grailsApplication.config.graphql?.defaultFinders?.each { fm ->
         log.debug("Add finder method ${fm} to ${key}");

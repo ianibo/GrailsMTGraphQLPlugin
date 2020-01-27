@@ -26,6 +26,17 @@ class Widget implements MultiTenant<Widget> {
            widgetName column: 'wid_name'
   }
 
+  static graphql = [
+    queries:[
+      'findWidgetByLuceneQuery':[
+        methodName:'findAllByLuceneQueryString',
+        args:[
+          [ type:String.class, param_name:'lucene_query' ]
+        ]
+      ]
+    ]
+  ]
+
   static hasMany = [
     lines: WidgetLine
   ]
