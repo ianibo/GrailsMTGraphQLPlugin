@@ -20,6 +20,8 @@ import groovy.util.logging.Slf4j
  * because of changes in the grails ecosystem domain class introspection can't happen until after
  * gorm is initialised. This means code that used to execute in doWithSpring needs to move to doWithApplicationConext
  * This class holds the various GraphQL artefacts that need to be configured after applicationContext initialisation
+ *
+ * This class mediates between the static domain class definitions and the GraphQL schema definitions
  */
 @Slf4j
 class GraphqlConfigManager implements GrailsApplicationAware {
@@ -59,6 +61,7 @@ class GraphqlConfigManager implements GrailsApplicationAware {
         log.debug("Class has static graphql config... process");
         graphql_config.queries.each { k,v -> 
           log.debug("Add query ${k} -> ${v}");
+          rwb.type( TypeRuntimeWiring.newTypeWiring("Mutation").dataFetcher(k, new PersistentClassDataFetcher(value, v)) )
         }
       }
 

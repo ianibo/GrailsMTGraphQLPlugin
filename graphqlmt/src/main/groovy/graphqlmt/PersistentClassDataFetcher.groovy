@@ -29,12 +29,21 @@ import org.grails.datastore.gorm.GormStaticApi
 class PersistentClassDataFetcher implements DataFetcher {
 
   private org.grails.datastore.mapping.model.PersistentEntity domainClass = null;
+  private Map config = null;
 
   public PersistentClassDataFetcher() {
   }
 
   public PersistentClassDataFetcher(org.grails.datastore.mapping.model.PersistentEntity domainClass) {
+    log.debug("PersistentClassDataFetcher::PersistentClassDataFetcher(${domainClass})");
     this.domainClass = domainClass;
+    this.config = [:];
+  }
+
+  public PersistentClassDataFetcher(org.grails.datastore.mapping.model.PersistentEntity domainClass, Map config) {
+    log.debug("PersistentClassDataFetcher::PersistentClassDataFetcher(${domainClass},${config})");
+    this.domainClass = domainClass;
+    this.config = config;
   }
 
   public Object get(DataFetchingEnvironment environment) {
