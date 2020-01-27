@@ -101,7 +101,10 @@ management:
     endpoints:
         jmx:
             unique-names: true
-
+---
+graphql:
+    defaultFinders:
+        - findAllByLuceneQueryString
 ---
 hibernate:
     cache:

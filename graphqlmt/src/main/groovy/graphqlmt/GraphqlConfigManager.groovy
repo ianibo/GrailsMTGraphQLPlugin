@@ -51,7 +51,13 @@ class GraphqlConfigManager implements GrailsApplicationAware {
       // rwb.type(RuntimeWiring.newTypeWiring("Query").dataFetcher("find${key}UsingLQS".toString(), (dataFetchingEnvironment) -> {
       //   println("Hello");
       // }
+
       rwb.type( TypeRuntimeWiring.newTypeWiring("Query").dataFetcher("find${key}UsingLQS".toString(), new PersistentClassDataFetcher(value)) )
+
+      // The we support List graphql.defaultFinders as a list of default finders that should be added
+      grailsApplication.config.graphql?.defaultFinders?.each { fm ->
+        log.debug("Add finder method ${fm} to ${key}");
+      }
 
       // See https://www.graphql-java.com/documentation/v13/execution/
       rwb.type( TypeRuntimeWiring.newTypeWiring("Mutation").dataFetcher("create${key}".toString(), new PersistentClassCreateMutation(value)) )
