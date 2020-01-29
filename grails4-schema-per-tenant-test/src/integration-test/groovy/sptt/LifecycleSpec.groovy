@@ -182,4 +182,44 @@ class LifecycleSpec extends Specification {
       'TestTenantF' | [ widgetName: 'Widget 335 - From createWidget mutation - TennantF', lines: [ [ widgetLineText:'Widget Line text 335' ] ] ]
   }
 
+  void "test Lucene query finder"(tenantid, qry) {
+    when:"We post a new tenant request to the admin controller"
+
+      logger.debug("graphql query (${qry}) for tenant ${tenantid}");
+
+      String status = null;
+
+      def httpBin = HttpBuilder.configure {
+        request.uri = 'http://localhost:'+serverPort
+        request.headers['X-TENANT'] = tenantid
+      }
+
+      def result = httpBin.post {
+        request.uri.path = '/graphql'
+        request.headers.'accept'='application/json'
+        // request.headers.'Content-Type'='application/json'
+        request.contentType = JSON[0]
+        request.body = [
+          'query': "query { findWidgetByLuceneQuery(luceneQueryString:\"title:${qry}\") { totalCount results { widgetName } } }".toString(),
+          'variables':[:]
+        ]
+        response.when(200) { FromServer fs, Object body ->
+          logger.debug("graphql query returns 200 ${body}");
+          // TestTenantG should have 4 widgets
+          assert body.data.findWidgetUsingLQS.totalCount==0
+          assert body.data.findWidgetUsingLQS.results.size==5
+          status='OK'
+        }
+      }
+      logger.debug("Result: ${result}");
+
+    then:"The response is correct"
+      status=='OK'
+
+    where:
+      tenantid | qry
+      'TestTenantG' | 'test'
+  }
+
+
 }
