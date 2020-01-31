@@ -61,7 +61,7 @@ class GraphqlConfigManager implements GrailsApplicationAware {
         log.debug("Class has static graphql config... process");
         graphql_config.queries.each { k,v -> 
           log.debug("Add query ${k} -> ${v}");
-          rwb.type( TypeRuntimeWiring.newTypeWiring("Mutation").dataFetcher(k, new PersistentClassDataFetcher(value, v)) )
+          rwb.type( TypeRuntimeWiring.newTypeWiring("Query").dataFetcher(k, new PersistentClassDataFetcher(value, v)) )
         }
       }
 
