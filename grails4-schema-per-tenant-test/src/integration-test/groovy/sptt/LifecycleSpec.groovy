@@ -206,8 +206,8 @@ class LifecycleSpec extends Specification {
         response.when(200) { FromServer fs, Object body ->
           logger.debug("graphql query returns 200 ${body}");
           // TestTenantG should have 4 widgets
-          assert body.data.findWidgetUsingLQS.totalCount==0
-          assert body.data.findWidgetUsingLQS.results.size==5
+          assert body.data.findWidgetByLuceneQuery.totalCount==0
+          assert body.data.findWidgetByLuceneQuery.results.size==5
           status='OK'
         }
       }

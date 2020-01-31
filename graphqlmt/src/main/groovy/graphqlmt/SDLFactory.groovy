@@ -88,7 +88,16 @@ type DeleteResult {
   public buildQueryTypeFields() {
     StringWriter sw = new StringWriter();
     domainClasses.each { key, value ->
-	sw.write("  find${key}UsingLQS(luceneQueryString: String) : ${key}PagedResult\n");
+      sw.write("  find${key}UsingLQS(luceneQueryString: String) : ${key}PagedResult\n");
+
+      Map graphql_config = grails.util.GrailsClassUtils.getStaticPropertyValue(value.getJavaClass(), 'graphql') as Map
+      if ( graphql_config != null ) {
+        log.debug("Class has static graphql config... process");
+        graphql_config.queries.each { k,v ->
+          log.debug("Adding ${k}(luceneQueryString: String) : ${key}PagedResult\n");
+          sw.write("  ${k}(luceneQueryString: String) : ${key}PagedResult\n");
+        }
+      }
     }
     return sw.toString();
   }
