@@ -185,7 +185,7 @@ class LifecycleSpec extends Specification {
   void "test Lucene query finder"(tenantid, qry) {
     when:"We post a new tenant request to the admin controller"
 
-      logger.debug("graphql query (${qry}) for tenant ${tenantid}");
+      logger.debug("\n\ngraphql query (${qry}) for tenant ${tenantid}");
 
       String status = null;
 
