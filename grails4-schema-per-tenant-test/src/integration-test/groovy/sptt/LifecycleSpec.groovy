@@ -184,13 +184,12 @@ class LifecycleSpec extends Specification {
   }
 
   void "test lucene finder works"(tenantid, qry, expected_count) {
-
     def n = 0;
-
     when:"We find by lucene query"
+      logger.debug("Testing findAllByLuceneQueryString(${qry})");
       Tenants.withId(tenantid.toLowerCase()) {
         def wl = Widget.findAllByLuceneQueryString(qry)
-        log.debug("Got result ${wl}")
+        logger.debug("Got result ${wl}")
         n = wl.totalCount
       }
 
@@ -199,16 +198,14 @@ class LifecycleSpec extends Specification {
 
     where:
       tenantid | qry | expected_count
-      'TestTenantG' | 'widgetName:Widget' | 6
+      'TestTenantG' | 'widgetName:"Test Widget A Tenant G"' | 1
+      'TestTenantG' | 'widgetName:"Widget"' | 6
   }
 
   void "test Lucene query finder"(tenantid, qry) {
     when:"We post a new tenant request to the admin controller"
-
       logger.debug("\n\ngraphql query (${qry}) for tenant ${tenantid}");
-
       String status = null;
-
       def httpBin = HttpBuilder.configure {
         request.uri = 'http://localhost:'+serverPort
         request.headers['X-TENANT'] = tenantid
@@ -220,14 +217,14 @@ class LifecycleSpec extends Specification {
         // request.headers.'Content-Type'='application/json'
         request.contentType = JSON[0]
         request.body = [
-          'query': "query { findWidgetByLuceneQuery(luceneQueryString:\"title:${qry}\") { totalCount results { widgetName } } }".toString(),
+          'query': "query { findWidgetByLuceneQuery(luceneQueryString:\"widgetName:${qry}\") { totalCount results { widgetName } } }".toString(),
           'variables':[:]
         ]
         response.when(200) { FromServer fs, Object body ->
           logger.debug("graphql query returns 200 ${body}");
           // TestTenantG should have 4 widgets
           assert body.data.findWidgetByLuceneQuery.totalCount==0
-          assert body.data.findWidgetByLuceneQuery.results.size==5
+          assert body.data.findWidgetByLuceneQuery.results.size==6
           status='OK'
         }
       }

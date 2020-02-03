@@ -26,6 +26,12 @@ class Widget implements MultiTenant<Widget> {
            widgetName column: 'wid_name'
   }
 
+  static query_config = [
+    properties:[
+      widgetName:[mode:'keyword']
+    ]
+  ]
+
   static graphql = [
     queries:[
       'findWidgetByLuceneQuery':[
