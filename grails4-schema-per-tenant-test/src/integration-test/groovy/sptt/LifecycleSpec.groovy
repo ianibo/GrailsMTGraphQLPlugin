@@ -12,6 +12,7 @@ import groovyx.net.http.FromServer
 import static groovyx.net.http.ContentTypes.JSON
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import grails.gorm.multitenancy.Tenants
 
 
 // See http://grails.github.io/grails-http/latest/
@@ -187,15 +188,17 @@ class LifecycleSpec extends Specification {
     def n = 0;
 
     when:"We find by lucene query"
-      def wl = Widget.findAllByLuceneQuery(qry)
-      log.debug("Got result ${wl}")
-      n = wl.totalCount
+      Tenants.withId(tenantid.toLowerCase()) {
+        def wl = Widget.findAllByLuceneQuery(qry)
+        log.debug("Got result ${wl}")
+        n = wl.totalCount
+      }
 
     then:"The response is correct"
       n == expected_count
 
     where:
-      tenantid | qry
+      tenantid | qry | expected_count
       'TestTenantG' | 'widgetName:Widget' | 6
   }
 
