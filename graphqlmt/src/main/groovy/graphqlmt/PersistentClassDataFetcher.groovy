@@ -53,11 +53,22 @@ class PersistentClassDataFetcher implements DataFetcher {
     log.debug("PersistentClassDataFetcher ${domainClass}/${environment?.arguments}");
 
     if ( config.methodName != null ) {
-      log.debug("config method name is ${config.methodName} / ${environment?.arguments?.luceneQueryString}");
-      def tr = domainClass.getJavaClass()."${config.methodName}"('widgetName:Widget')
+      Map params = [
+        max:environment?.arguments?.max?:10,
+        offset: environment?.arguments?.offset?:0,
+        sort: environment?.arguments?.sort,
+        order: environment?.arguments?.order
+      ]
+
+      log.debug("config method name is ${config.methodName} / ${environment?.arguments?.luceneQueryString} / ${params}");
+
+      def tr = domainClass.getJavaClass()."${config.methodName}"('widgetName:Widget', params)
       log.debug("Result is ${tr}");
+
       result = [
-        totalCount:0,
+        offset:params.offset,
+        max:params.max,
+        totalCount:tr.totalCount,
         results: tr
       ]
     }
