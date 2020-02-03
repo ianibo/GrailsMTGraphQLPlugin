@@ -56,6 +56,8 @@ class GraphqlController {
     log.debug("Process query: ${query}");
     Map<String, Object> result = new LinkedHashMap<>()
 
+    log.debug("Calling graphqlConfigManager.graphQL.execute....");
+
     ExecutionResult executionResult = graphqlConfigManager.graphQL.execute(ExecutionInput.newExecutionInput()
                  .query(query)
                  .operationName(operationName)

@@ -182,6 +182,23 @@ class LifecycleSpec extends Specification {
       'TestTenantF' | [ widgetName: 'Widget 335 - From createWidget mutation - TennantF', lines: [ [ widgetLineText:'Widget Line text 335' ] ] ]
   }
 
+  void "test lucene finder works"(tenantid, qry, expected_count) {
+
+    def n = 0;
+
+    when:"We find by lucene query"
+      def wl = Widget.findAllByLuceneQuery(qry)
+      log.debug("Got result ${wl}")
+      n = wl.totalCount
+
+    then:"The response is correct"
+      n == expected_count
+
+    where:
+      tenantid | qry
+      'TestTenantG' | 'widgetName:Widget' | 6
+  }
+
   void "test Lucene query finder"(tenantid, qry) {
     when:"We post a new tenant request to the admin controller"
 
@@ -206,8 +223,8 @@ class LifecycleSpec extends Specification {
         response.when(200) { FromServer fs, Object body ->
           logger.debug("graphql query returns 200 ${body}");
           // TestTenantG should have 4 widgets
-          assert body.data.findWidgetUsingLQS.totalCount==0
-          assert body.data.findWidgetUsingLQS.results.size==5
+          assert body.data.findWidgetByLuceneQuery.totalCount==0
+          assert body.data.findWidgetByLuceneQuery.results.size==5
           status='OK'
         }
       }

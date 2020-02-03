@@ -50,17 +50,26 @@ class PersistentClassDataFetcher implements DataFetcher {
     Map result = null;
     // println("PersistentClassDataFetcher::get(${environment})");
     log.debug("PersistentClassDataFetcher ${domainClass.class.name}");
-    // log.debug("PersistentClassDataFetcher ${domainClass}/${environment}");
+    log.debug("PersistentClassDataFetcher ${domainClass}/${environment?.arguments}");
 
-    // GormStaticApi staticApi = GormEnhancer.findStaticApi(domainClass.javaClass)
-
-    log.debug("Call domainClass.list()");
-    // def qr = staticApi.list()
-    // result = domainClass.getJavaClass().wibble()
-    result = [ 
-               totalCount: 0,
-               results: domainClass.getJavaClass().list()
-             ];
+    if ( config.methodName != null ) {
+      log.debug("config method name is ${config.methodName} / ${environment?.arguments?.luceneQueryString}");
+      def tr = domainClass.getJavaClass()."${config.methodName}"('widgetName:Widget')
+      log.debug("Result is ${tr}");
+      result = [
+        totalCount:0,
+        results: tr
+      ]
+    }
+    else {
+      log.debug("Call domainClass.list()");
+      // def qr = staticApi.list()
+      // result = domainClass.getJavaClass().wibble()
+      result = [ 
+                 totalCount: 0,
+                 results: domainClass.getJavaClass().list()
+               ];
+    }
 
     log.debug("get completetd with result: ${result}");
  
