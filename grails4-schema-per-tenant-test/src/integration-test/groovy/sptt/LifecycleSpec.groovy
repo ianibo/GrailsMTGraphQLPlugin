@@ -189,7 +189,7 @@ class LifecycleSpec extends Specification {
 
     when:"We find by lucene query"
       Tenants.withId(tenantid.toLowerCase()) {
-        def wl = Widget.findAllByLuceneQuery(qry)
+        def wl = Widget.findAllByLuceneQueryString(qry)
         log.debug("Got result ${wl}")
         n = wl.totalCount
       }
