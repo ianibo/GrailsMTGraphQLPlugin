@@ -8,7 +8,7 @@ buildscript {
 }
 
 version "0.1"
-group "graphqlmt"
+group "com.semweb"
 
 apply plugin:"eclipse"
 apply plugin:"idea"
@@ -73,3 +73,41 @@ grailsPublish {
     desc = "Full plugin description"
     developers = [johndoe:"John Doe"]
 }
+
+task dopub(dependsOn: 'build') {
+  if(project.version.endsWith('-SNAPSHOT')) {
+    // publishMavenPublicationToKISnapshotsRepository.execute()
+    print("dopub snapshot");
+    // tasks.publishMavenPublicationToKISnapshotsRepository.execute()
+    dependsOn('publishMavenPublicationToKISnapshotsRepository')
+  }
+  else {
+    // publishMavenPublicationToKIReleasesRepository.execute()
+    print("dopub release");
+    // tasks.publishMavenPublicationToKIReleasesRepository.execute()
+    dependsOn('publishMavenPublicationToKIReleasesRepository')
+  }
+}
+
+publishing {
+  repositories {
+    maven {
+      name "KISnapshots"
+      url "http://nexus.k-int.com/content/repositories/snapshots/"
+      credentials {
+        username project.hasProperty('knowintNexusUser') ? knowintNexusUser :''
+        password project.hasProperty('knowintNexusPass') ? knowintNexusPass :''
+      }
+    }
+
+    maven  {
+      name "KIReleases"
+      url "http://nexus.k-int.com/content/repositories/releases/"
+      credentials {
+        username project.hasProperty('knowintNexusUser') ? knowintNexusUser :''
+        password project.hasProperty('knowintNexusPass') ? knowintNexusPass :''
+      }
+    }
+  }
+}
+
