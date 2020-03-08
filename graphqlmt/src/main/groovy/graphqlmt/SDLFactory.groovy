@@ -93,14 +93,17 @@ type DeleteResult {
       Map graphql_config = grails.util.GrailsClassUtils.getStaticPropertyValue(value.getJavaClass(), 'graphql') as Map
       if ( graphql_config != null ) {
         if ( graphql_config instanceof Map ) {
-          log.debug("Class has static graphql config... process");
+          log.debug("Class (${key}) has static graphql config... process");
           graphql_config.queries.each { k,v ->
             log.debug("Adding ${k}(luceneQueryString: String) : ${key}PagedResult\n");
             sw.write("  ${k}(luceneQueryString: String) : ${key}PagedResult\n");
           }
         }
+        else if ( graphql_config instanceof java.lang.Boolean ) {
+          // No special action at the moment
+        }
         else {
-          log.warn("${value.getJavaClass()} has graphql member but it is an instance of ${graphql_config.class.name} with value of ${graphql_config}. Expected map");
+          log.warn("${key} has graphql property but it is an instance of ${graphql_config.class.name} with value of ${graphql_config}. Expected map");
         }
       }
     }
