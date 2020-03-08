@@ -178,6 +178,11 @@ type DeleteResult {
         // If we're creating input typedefs, add InputType on to the end *ugh*
         result = "${associated_entity.getJavaClass().getSimpleName()}${isInputType?'InputType':''}".toString();
       }
+      else if ( pp instanceof org.grails.datastore.mapping.model.types.OneToOne ) {
+        PersistentEntity associated_entity = pp.getAssociatedEntity();
+        // If we're creating input typedefs, add InputType on to the end *ugh*
+        result = "${associated_entity.getJavaClass().getSimpleName()}${isInputType?'InputType':''}".toString();
+      }
       else {
         log.warn("Unhandled association type ${pp}");
       }
