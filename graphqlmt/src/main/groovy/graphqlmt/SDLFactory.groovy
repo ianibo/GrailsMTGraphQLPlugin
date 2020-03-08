@@ -90,10 +90,10 @@ type DeleteResult {
     domainClasses.each { key, value ->
       sw.write("  find${key}UsingLQS(luceneQueryString: String) : ${key}PagedResult\n");
 
-      Map graphql_config = grails.util.GrailsClassUtils.getStaticPropertyValue(value.getJavaClass(), 'graphql') as Map
+      Object graphql_config = grails.util.GrailsClassUtils.getStaticPropertyValue(value.getJavaClass(), 'graphql')
       if ( graphql_config != null ) {
         if ( graphql_config instanceof Map ) {
-          log.debug("Class (${key}) has static graphql config... process");
+          log.debug("Class (${key}) has static graphql config");
           graphql_config.queries.each { k,v ->
             log.debug("Adding ${k}(luceneQueryString: String) : ${key}PagedResult\n");
             sw.write("  ${k}(luceneQueryString: String) : ${key}PagedResult\n");

@@ -9,6 +9,8 @@ class WidgetLine implements MultiTenant<WidgetLine> {
 
   static belongsTo = [ owner: Widget ]
 
+  static graphql = true;
+
   static mapping = {
                    id column: 'wl_id', generator: 'uuid2', length:36
               version column: 'wl_version'

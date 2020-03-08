@@ -56,12 +56,14 @@ class GraphqlConfigManager implements GrailsApplicationAware {
 
       rwb.type( TypeRuntimeWiring.newTypeWiring("Query").dataFetcher("find${key}UsingLQS".toString(), new PersistentClassDataFetcher(value)) )
 
-      Map graphql_config = grails.util.GrailsClassUtils.getStaticPropertyValue(value.getJavaClass(), 'graphql') as Map
+      Object graphql_config = grails.util.GrailsClassUtils.getStaticPropertyValue(value.getJavaClass(), 'graphql')
       if ( graphql_config != null ) {
-        log.debug("Class has static graphql config... process");
-        graphql_config.queries.each { k,v -> 
-          log.debug("Add query ${k} -> ${v}");
-          rwb.type( TypeRuntimeWiring.newTypeWiring("Query").dataFetcher(k, new PersistentClassDataFetcher(value, v)) )
+        if ( graphql_config instanceof Map ) {
+          log.debug("Class ${key} has static graphql config... process");
+          graphql_config.queries.each { k,v -> 
+            log.debug("Add query ${k} -> ${v}");
+            rwb.type( TypeRuntimeWiring.newTypeWiring("Query").dataFetcher(k, new PersistentClassDataFetcher(value, v)) )
+          }
         }
       }
 
