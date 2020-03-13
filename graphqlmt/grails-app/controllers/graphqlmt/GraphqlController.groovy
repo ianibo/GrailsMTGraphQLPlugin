@@ -13,6 +13,7 @@ import groovy.transform.CompileStatic
 import grails.converters.JSON
 import grails.gorm.multitenancy.CurrentTenant
 import grails.gorm.transactions.Transactional
+import grails.gorm.multitenancy.Tenants
 
 @CurrentTenant
 class GraphqlController {
@@ -24,7 +25,7 @@ class GraphqlController {
 
   // https://github.com/grails/gorm-graphql/blob/master/plugin/grails-app/controllers/org/grails/gorm/graphql/plugin/GraphqlController.groovy
   def index() {
-    log.debug("GraphqlController::index(${params})");
+    log.debug("GraphqlController::index(${params}) -- tenant=${Tenants.currentId()}");
     String query = null;
     String operationName = null;
     Object context = null;
