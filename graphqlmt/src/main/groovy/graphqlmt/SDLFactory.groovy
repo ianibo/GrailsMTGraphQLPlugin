@@ -150,9 +150,9 @@ type DeleteResult {
     log.debug("writeDomainClassProperties(${dc})");
     // @See https://gorm.grails.org/6.0.x/api/org/grails/datastore/mapping/model/PersistentProperty.html
     dc.getPersistentProperties().each { PersistentProperty pp ->
-      log.debug(" -> Process persistent property: ${pp} ${pp.getName()} type:${pp.getType()} ${pp.class.name}");
+      log.debug("  -> Process persistent property: ${pp} ${pp.getName()} type:${pp.getType()} ${pp.class.name}");
       String tp = convertType(pp, pp.getType(), isInputType);
-      log.debug("   -> type conversion = ${tp}");
+      log.debug("  -> type conversion = ${tp}");
       sw.write("  ${pp.getName()}: ${tp}\n".toString());
     }
 
@@ -167,7 +167,7 @@ type DeleteResult {
     String result = null;
 
     if ( pp instanceof org.grails.datastore.mapping.model.types.Association ) {
-      log.debug("process association ${pp.class.name}");
+      log.debug("    -> process association ${pp.class.name}");
       if ( pp instanceof org.grails.datastore.mapping.model.types.OneToMany ) {
         PersistentEntity associated_entity = pp.getAssociatedEntity();
         // If we're creating input typedefs, add InputType on to the end *ugh*
@@ -184,24 +184,25 @@ type DeleteResult {
         result = "${associated_entity.getJavaClass().getSimpleName()}${isInputType?'InputType':''}".toString();
       }
       else {
-        log.warn("Unhandled association type ${pp}");
+        log.warn("    -> Unhandled association type ${pp}");
       }
-
     }
     else {
-      log.debug("Handle instance of ${pp.class.name}");
+      // log.debug("    -> Handle instance of ${c} (${c?.class.name}) / ${pp.class.name}");
       switch ( c ) {
         case String.class:
-          log.debug("It's a string");
           result = 'String';
+          break;
         case Long.class:
           result = 'Int';
+          break;
         case Set.class:
-          log.debug("Handling a set");
           result = null;
+          break;
         default:
-          log.debug("unhandled type ${c}");
+          log.debug("    -> unhandled type ${c}");
           result = 'String';
+          break;
       }
     }
     return result;
