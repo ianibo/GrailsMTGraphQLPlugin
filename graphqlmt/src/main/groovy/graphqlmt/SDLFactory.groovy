@@ -88,7 +88,7 @@ type DeleteResult {
   public buildQueryTypeFields() {
     StringWriter sw = new StringWriter();
     domainClasses.each { key, value ->
-      sw.write("  find${key}UsingLQS(luceneQueryString: String) : ${key}PagedResult\n");
+      // sw.write("  find${key}UsingLQS(luceneQueryString: String) : ${key}PagedResult\n");
 
       Object graphql_config = grails.util.GrailsClassUtils.getStaticPropertyValue(value.getJavaClass(), 'graphql')
       if ( graphql_config != null ) {
@@ -96,7 +96,12 @@ type DeleteResult {
           log.debug("Class (${key}) has static graphql config");
           graphql_config.queries.each { k,v ->
             log.debug("Adding ${k}(luceneQueryString: String) : ${key}PagedResult\n");
-            sw.write("  ${k}(luceneQueryString: String) : ${key}PagedResult\n");
+
+            //ToDo: This needs to be String not "class java.lang.String"
+            String args = v.args.collect{"${it.param_name}: ${getTypeNameFor(it.type)}"}.join(', ')
+            log.debug("----- ${k}(${args}) : ${key}PagedResult");
+            sw.write("  ${k}(${args}) : ${key}PagedResult\n");
+            // sw.write("  ${k}(luceneQueryString: String) : ${key}PagedResult\n");
           }
         }
         else if ( graphql_config instanceof java.lang.Boolean ) {
@@ -206,6 +211,27 @@ type DeleteResult {
       }
     }
     return result;
+  }
+
+  private getTypeNameFor(Class c) {
+    String result = null;
+
+    switch ( c ) {
+        case String.class:
+          result = 'String';
+          break;
+        case Long.class:
+          result = 'Int';
+          break;
+        case Set.class:
+          result = null;
+          break;
+        default:
+          log.debug("    -> unhandled type ${c}");
+          result = 'String';
+          break;
+     }
+     return result;
   }
 
 }

@@ -34,12 +34,8 @@ class Widget implements MultiTenant<Widget> {
 
   static graphql = [
     queries:[
-      'findWidgetByLuceneQuery':[
-        methodName:'findAllByLuceneQueryString',
-        args:[
-          [ type:String.class, param_name:'lucene_query' ]
-        ]
-      ]
+      'findWidgetByLuceneQuery':[ methodName:'findAllByLuceneQueryString', args:[ [ type:String.class, param_name:'luceneQueryString' ] ] ],
+      'findAllByWidgetName':[ methodName:'findAllByWidgetName', args:[ [ type:String.class, param_name:'widgetName' ] ] ]
     ]
   ]
 
