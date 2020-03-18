@@ -29,6 +29,7 @@ logger ('grails.app.jobs', DEBUG)
 logger ('grails.app.services', DEBUG)
 logger ('sptt', DEBUG)
 logger ('graphqlmt', DEBUG)
+logger ('gormfindbylqs', DEBUG)
 
 def targetDir = BuildSettings.TARGET_DIR
 if (Environment.isDevelopmentMode() && targetDir != null) {
