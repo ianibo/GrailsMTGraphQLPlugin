@@ -61,15 +61,20 @@ class PersistentClassDataFetcher implements DataFetcher {
         order: environment?.arguments?.order
       ]
 
-      log.debug("config method name is ${config.methodName} / ${environment?.arguments?.luceneQueryString} / ${params}");
+      log.debug("config method name is ${config.methodName} / ${params}");
+      List method_call_args=[]
+      config.args?.each { arg ->
+        method_call_args.add(environment?.arguments[arg.param_name])
+      }
+      log.debug("Calculated param list: ${method_call_args}");
 
-      def tr = domainClass.getJavaClass()."${config.methodName}"('widgetName:Widget', params)
-      log.debug("Result is ${tr}");
+      def tr = domainClass.getJavaClass()."${config.methodName}"(*method_call_args, params)
+      log.debug("Result is ${tr} / ${tr?.class.name}");
 
       result = [
         offset:params.offset,
         max:params.max,
-        totalCount:tr.totalCount,
+        totalCount:tr?.totalCount?:0,
         results: tr
       ]
     }

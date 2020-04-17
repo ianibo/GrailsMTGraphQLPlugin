@@ -101,7 +101,7 @@ class LifecycleSpec extends Specification {
       'TestTenantF' | 'Test Widget A Tenant F'
   }
 
-  void "test Graphql Widget"(tenantid, qry) {
+  void "test Graphql Widget"(tenantid, qry, expectedCount) {
     when:"We post a new tenant request to the admin controller"
 
       logger.debug("graphql query (${qry}) for tenant ${tenantid}");
@@ -119,14 +119,14 @@ class LifecycleSpec extends Specification {
         // request.headers.'Content-Type'='application/json'
         request.contentType = JSON[0]
         request.body = [
-          'query': "query { findWidgetUsingLQS(luceneQueryString:\"title:${qry}\") { totalCount results { widgetName } } }".toString(),
+          'query': "query { findAllByWidgetName(widgetName:\"${qry}\") { totalCount results { widgetName } } }".toString(),
           'variables':[:]
         ]
         response.when(200) { FromServer fs, Object body ->
           logger.debug("graphql query returns 200 ${body}");
           // TestTenantG should have 4 widgets
-          assert body.data.findWidgetUsingLQS.totalCount==0
-          assert body.data.findWidgetUsingLQS.results.size==5
+          assert body.data.findAllByWidgetName.totalCount==expectedCount
+          assert body.data.findAllByWidgetName.results.size==expectedCount
           status='OK'
         }
       }
@@ -136,8 +136,8 @@ class LifecycleSpec extends Specification {
       status=='OK'
 
     where:
-      tenantid | qry
-      'TestTenantG' | 'test'
+      tenantid | qry | expectedCount
+      'TestTenantG' | 'ThisWidgetWontBeFound' | 0
   }
 
   void "test Create Mutation for Widget"(tenantid, record) {
@@ -202,9 +202,9 @@ class LifecycleSpec extends Specification {
       'TestTenantG' | 'widgetName:"Widget"' | 6
   }
 
-  void "test Lucene query finder"(tenantid, qry) {
+  void "test Lucene query finder"(tenantid, qry, expected_count) {
     when:"We post a new tenant request to the admin controller"
-      logger.debug("\n\ngraphql query (${qry}) for tenant ${tenantid}");
+      logger.debug("\n\ngraphql query (${qry}) for tenant ${tenantid} expects ${expected_count} records");
       String status = null;
       def httpBin = HttpBuilder.configure {
         request.uri = 'http://localhost:'+serverPort
@@ -223,8 +223,8 @@ class LifecycleSpec extends Specification {
         response.when(200) { FromServer fs, Object body ->
           logger.debug("graphql query returns 200 ${body}");
           // TestTenantG should have 4 widgets
-          assert body.data.findWidgetByLuceneQuery.totalCount==6
-          assert body.data.findWidgetByLuceneQuery.results.size==6
+          assert body.data.findWidgetByLuceneQuery.totalCount==expected_count
+          assert body.data.findWidgetByLuceneQuery.results.size==expected_count
           status='OK'
         }
       }
@@ -234,8 +234,8 @@ class LifecycleSpec extends Specification {
       status=='OK'
 
     where:
-      tenantid | qry
-      'TestTenantG' | 'test'
+      tenantid | qry | expected_count
+      'TestTenantG' | 'test' | 5
   }
 
 
