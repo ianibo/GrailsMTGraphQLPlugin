@@ -18,6 +18,7 @@ import graphql.schema.DataFetchingEnvironment;
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormStaticApi
 
+import grails.gorm.multitenancy.Tenants
 
 /**
  * because of changes in the grails ecosystem domain class introspection can't happen until after
@@ -49,7 +50,7 @@ class PersistentClassDataFetcher implements DataFetcher {
   public Object get(DataFetchingEnvironment environment) {
     Map result = null;
     // println("PersistentClassDataFetcher::get(${environment})");
-    log.debug("PersistentClassDataFetcher ${domainClass.class.name}");
+    log.debug("PersistentClassDataFetcher ${domainClass.class.name} - tenant = ${Tenants.currentId()}");
     log.debug("PersistentClassDataFetcher ${domainClass}/${environment?.arguments}");
 
     if ( config.methodName != null ) {

@@ -139,7 +139,7 @@ type DeleteResult {
   }
 
   public void writeDomainClassProperties(StringWriter sw, PersistentEntity dc, boolean isInputType) {
-
+    log.debug("writeDomainClassProperties for ${dc}");
     log.debug("composite identity ${dc.getCompositeIdentity()}");
     org.grails.datastore.mapping.model.types.Identity id = dc.getIdentity()
     if ( id != null ) {
