@@ -14,6 +14,7 @@ import grails.converters.JSON
 import grails.gorm.multitenancy.CurrentTenant
 import grails.gorm.transactions.Transactional
 import grails.gorm.multitenancy.Tenants
+import org.grails.web.util.WebUtils
 
 @CurrentTenant
 class GraphqlController {
@@ -35,8 +36,12 @@ class GraphqlController {
     String operationName = null;
 
     // context is an Object in the graphql api and is not used by the library itself but is
-    // instead a container where we can add our own context properties
-    Map<String,Object> context = graphqlContextBuilder?.buildContext(request)
+    // instead a container where we can add our own context properties. Estabilst this by adding
+    // an entry to spring/resources.groovy like graphqlContextBuilder(SpttContextBuilder)
+    def gwr = WebUtils.retrieveGrailsWebRequest()
+    Map<String,Object> context = graphqlContextBuilder?.buildContext(gwr)
+    log.debug("context will be ${context}");
+
     Map<String,Object> variables = [:]
 
     if (request.contentLength != 0 && request.method != 'GET' ) {
