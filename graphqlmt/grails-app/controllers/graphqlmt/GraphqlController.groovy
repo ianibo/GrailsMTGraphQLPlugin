@@ -19,16 +19,24 @@ import grails.gorm.multitenancy.Tenants
 class GraphqlController {
 
   static responseFormats = ['json', 'xml']
+
   // GraphQL graphQL
   GraphqlConfigManager graphqlConfigManager;
 
+  // Declare a graphql context builder - if the host application declares a spring bean of the form
+  // graphqlContextBuilder(MyGraphQLContextBuilder) then it will be used here to get hold of the context
+  // otherwise the fetcher will be passed a null context.
+  GraphqlContextBuilder graphqlContextBuilder;
 
   // https://github.com/grails/gorm-graphql/blob/master/plugin/grails-app/controllers/org/grails/gorm/graphql/plugin/GraphqlController.groovy
   def index() {
     log.debug("GraphqlController::index(${params}) -- tenant=${Tenants.currentId()}");
     String query = null;
     String operationName = null;
-    Object context = null;
+
+    // context is an Object in the graphql api and is not used by the library itself but is
+    // instead a container where we can add our own context properties
+    Map<String,Object> context = graphqlContextBuilder?.buildContext(request)
     Map<String,Object> variables = [:]
 
     if (request.contentLength != 0 && request.method != 'GET' ) {
