@@ -66,6 +66,11 @@ class PersistentClassDataFetcher implements DataFetcher {
       config.args?.each { arg ->
         method_call_args.add(environment?.arguments[arg.param_name])
       }
+
+      if ( config.addContext == true ) {
+        method_call_args.add(environment.getContext());
+      }
+
       log.debug("Calculated param list: ${method_call_args}");
 
       def tr = domainClass.getJavaClass()."${config.methodName}"(*method_call_args, params)

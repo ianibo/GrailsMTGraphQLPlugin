@@ -3,11 +3,13 @@ package sptt
 import grails.gorm.MultiTenant
 import org.grails.datastore.gorm.GormEntity
 import grails.gorm.annotation.Entity
+import groovy.util.logging.Slf4j
 
 // 
 // public class Widget implements MultiTenant<Widget> {
 // class Widget implements GormEntity<Widget>, MultiTenant<Widget> {
 // @Entity
+@Slf4j
 class Widget implements MultiTenant<Widget> {
 
   String id
@@ -34,7 +36,10 @@ class Widget implements MultiTenant<Widget> {
 
   static graphql = [
     queries:[
-      'findWidgetByLuceneQuery':[ methodName:'findAllByLuceneQueryString', args:[ [ type:String.class, param_name:'luceneQueryString' ] ] ],
+      'findWidgetByLuceneQuery':[ 
+        methodName:'internalFindAllByLuceneQueryString', 
+        args:[ [ type:String.class, param_name:'luceneQueryString' ] ], 
+        addContext:true ],
       'findAllByWidgetName':[ methodName:'findAllByWidgetName', args:[ [ type:String.class, param_name:'widgetName' ] ] ]
     ]
   ]
@@ -51,4 +56,8 @@ class Widget implements MultiTenant<Widget> {
     widgetName(nullable:false)
   }
 
+  public static grails.orm.PagedResultList internalFindAllByLuceneQueryString(String luceneQueryString, Map context, Map query_params=[:]) {
+    log.debug("internalFindAllByLuceneQueryString(${luceneQueryString},${context},${query_params})");
+    return findAllByLuceneQueryString(luceneQueryString, query_params)
+  }
 }
