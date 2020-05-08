@@ -100,8 +100,7 @@ type DeleteResult {
             //ToDo: This needs to be String not "class java.lang.String"
             String args = v.args.collect{"${it.param_name}: ${getTypeNameFor(it.type)}"}.join(', ')
             log.debug("----- ${k}(${args}) : ${key}PagedResult");
-            sw.write("  ${k}(${args}) : ${key}PagedResult\n");
-            // sw.write("  ${k}(luceneQueryString: String) : ${key}PagedResult\n");
+            sw.write("  ${k}(${args}, max: Int, offset: Int, sort:String, order:String) : ${key}PagedResult\n");
           }
         }
         else if ( graphql_config instanceof java.lang.Boolean ) {

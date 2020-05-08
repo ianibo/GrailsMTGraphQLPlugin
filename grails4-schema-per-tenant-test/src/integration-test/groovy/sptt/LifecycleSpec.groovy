@@ -239,4 +239,94 @@ class LifecycleSpec extends Specification {
   }
 
 
+  void "Create lots of widgets"(tenantid, baseName) {
+    when:"We post a new widget mutation"
+
+      logger.debug("graphql mutation create records with base name (${baseName}) for tenant ${tenantid}");
+
+      String status = null;
+
+      def httpBin = HttpBuilder.configure {
+        request.uri = 'http://localhost:'+serverPort
+        request.headers['X-TENANT'] = tenantid
+      }
+
+      for ( int i=0; i<1000; i++ ) {
+
+        if ( i % 200 == 0 ) {
+           logger.debug("${tenantid} ${baseName} ${i}");
+        }
+
+        def record = [
+          widgetName: baseName+' - '+String.format("%07d", i)+' ['+tenantid+']'
+        ]
+
+        def result = httpBin.post {
+          request.uri.path = '/graphql'
+          request.headers.'accept'='application/json'
+          // request.headers.'Content-Type'='application/json'
+          request.contentType = JSON[0]
+          request.body =  [
+            "query" : 'mutation($widget: WidgetInputType) { createWidget(widget: $widget) { id widgetName lines { widgetLineText } } }',
+            "variables": [
+              "widget" : record
+            ]
+          ]
+
+          response.when(200) { FromServer fs, Object body ->
+            logger.debug("graphql mutation returns 200 ${body}");
+            assert body.data.createWidget.widgetName == record.widgetName
+            assert body.data.createWidget.id != null
+            status='OK'
+          }
+        }
+        logger.debug("Result: ${result}");
+      }
+
+    then:"The response is correct"
+      status=='OK'
+
+    where:
+      tenantid | baseName
+      'TestTenantG' | 'Bulk G'
+      'TestTenantF' | 'Bulk F'
+  }
+
+  void "test graphql pagination"(tenantid, qry, expected_count) {
+    when:"We post a new tenant request to the admin controller"
+      logger.debug("\n\ngraphql query (${qry}) for tenant ${tenantid} expects ${expected_count} records");
+      String status = null;
+      def httpBin = HttpBuilder.configure {
+        request.uri = 'http://localhost:'+serverPort
+        request.headers['X-TENANT'] = tenantid
+      }
+
+      def result = httpBin.post {
+        request.uri.path = '/graphql'
+        request.headers.'accept'='application/json'
+        // request.headers.'Content-Type'='application/json'
+        request.contentType = JSON[0]
+        request.body = [
+          'query': "query { findWidgetByLuceneQuery(luceneQueryString:\"widgetName:${qry}\", max:15, sort:\"widgetName\") { totalCount results { widgetName } } }".toString(),
+          'variables':[:]
+        ]
+        response.when(200) { FromServer fs, Object body ->
+          logger.debug("graphql query returns 200 ${body}");
+          // TestTenantG should have 4 widgets
+          assert body.data.findWidgetByLuceneQuery.totalCount==expected_count
+          assert body.data.findWidgetByLuceneQuery.results.size<=15
+          status='OK'
+        }
+      }
+      logger.debug("Result: ${result}");
+
+    then:"The response is correct"
+      status=='OK'
+
+    where:
+      tenantid | qry | expected_count
+      'TestTenantG' | 'Bulk' | 1000
+  }
+
+
 }

@@ -38,7 +38,9 @@ class Widget implements MultiTenant<Widget> {
     queries:[
       'findWidgetByLuceneQuery':[ 
         methodName:'internalFindAllByLuceneQueryString', 
-        args:[ [ type:String.class, param_name:'luceneQueryString' ] ], 
+        args:[ 
+          [ type:String.class, param_name:'luceneQueryString' ]
+        ], 
         addContext:true ],
       'findAllByWidgetName':[ methodName:'findAllByWidgetName', args:[ [ type:String.class, param_name:'widgetName' ] ] ]
     ]
