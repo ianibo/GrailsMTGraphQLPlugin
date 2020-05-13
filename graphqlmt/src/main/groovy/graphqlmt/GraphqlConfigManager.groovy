@@ -65,6 +65,9 @@ class GraphqlConfigManager implements GrailsApplicationAware {
           }
         }
       }
+ 
+      // Add a fetcher for the getType(String id) call
+      rwb.type( TypeRuntimeWiring.newTypeWiring("Query").dataFetcher("get${key}".toString(), new SingleObjectDataFetcher(value)) )
 
       // The we support List graphql.defaultFinders as a list of default finders that should be added
       grailsApplication.config.graphql?.defaultFinders?.each { fm ->

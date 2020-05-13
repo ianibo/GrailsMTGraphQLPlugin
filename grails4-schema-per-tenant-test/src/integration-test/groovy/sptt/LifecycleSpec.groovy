@@ -25,8 +25,8 @@ class LifecycleSpec extends Specification {
   final static String baseUrl = 'http://localhost:8080';
   final static Logger logger = LoggerFactory.getLogger(LifecycleSpec.class);
 
- @Value('${local.server.port}')
- Integer serverPort
+  @Value('${local.server.port}')
+  Integer serverPort
 
   def setup() {
   }
@@ -326,6 +326,65 @@ class LifecycleSpec extends Specification {
     where:
       tenantid | qry | expected_count
       'TestTenantG' | 'Bulk' | 1000
+  }
+
+  void "test fetching a single resource"(tenantid, qry) {
+    String target_id = null;
+
+    String status = null;
+    def httpBin = HttpBuilder.configure {
+      request.uri = 'http://localhost:'+serverPort
+      request.headers['X-TENANT'] = tenantid
+    }
+
+    when:"We execute a search for resources"
+      logger.debug("\n\ngraphql query (${qry}) for tenant ${tenantid}");
+
+      def result = httpBin.post {
+        request.uri.path = '/graphql'
+        request.headers.'accept'='application/json'
+        // request.headers.'Content-Type'='application/json'
+        request.contentType = JSON[0]
+        request.body = [
+          'query': "query { findWidgetByLuceneQuery(luceneQueryString:\"widgetName:${qry}\", max:15, sort:\"widgetName\") { totalCount results { id widgetName } } }".toString(),
+          'variables':[:]
+        ]
+        response.when(200) { FromServer fs, Object body ->
+          logger.debug("graphql query returns 200 ${body}");
+          // TestTenantG should have 4 widgets
+          target_id = body.data.findWidgetByLuceneQuery.results[0].id;
+          status='OK'
+        }
+      }
+      logger.debug("Result: ${result}");
+
+    then:"We extract a record ID"
+      target_id != null;
+
+      def result2 = httpBin.post {
+        request.uri.path = '/graphql'
+        request.headers.'accept'='application/json'
+        // request.headers.'Content-Type'='application/json'
+        request.contentType = JSON[0]
+        request.body = [
+          'query': "query { getWidget(id:\"${target_id}\") { id widgetName } }".toString(),
+          'variables':[:]
+        ]
+        response.when(200) { FromServer fs, Object body ->
+          logger.debug("graphql query returns 200 ${body}");
+          // TestTenantG should have 4 widgets
+          status='OK'
+        }
+      }
+      logger.debug("Result: ${result2}");
+
+
+    then:"We do a get on that ID"
+
+
+    where:
+      tenantid | qry
+      'TestTenantG' | 'Bulk'
   }
 
 

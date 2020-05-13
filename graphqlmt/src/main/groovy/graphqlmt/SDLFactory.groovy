@@ -110,6 +110,11 @@ type DeleteResult {
           log.warn("${key} has graphql property but it is an instance of ${graphql_config.class.name} with value of ${graphql_config}. Expected map");
         }
       }
+
+      // Add a getType method to retrieve a single instance by ID
+      // src/main/groovy/graphqlmt/GraphqlConfigManager.groovy is responsible for installing the data fetcher that
+      // respond to this field
+      sw.write("  get${key}(id:String) : ${key}\n");
     }
     return sw.toString();
   }
