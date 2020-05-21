@@ -15,11 +15,6 @@ node {
       echo 'Hello, JDK'
       sh 'java -version'
       sh './gradlew --version'
-
-      // We would like to access the credentials declared
-      withCredentials([usernamePassword(credentialsId: 'kinexus', usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
-        sh 'echo NEXUS_USERNAME=${NUSER} NEXUS_PASSWORD=${NPASS}'
-      }
     }
   }
 
